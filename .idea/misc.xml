@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.9 (DJ Libary Sync Tool)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.9 (DJ Libary Sync Tool)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.9 (PySync DJ)" project-jdk-type="Python SDK" />
 </project>
