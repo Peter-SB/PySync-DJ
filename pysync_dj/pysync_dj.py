@@ -8,7 +8,7 @@ from rekordbox_library import RekordboxLibrary
 from utils import init_logging, LOGGER_NAME, set_track_metadata, load_hashmap_from_json, save_hashmap_to_json, \
     extract_spotify_playlist_id, sanitize_filename
 from spotify_helper import SpotifyHelper
-from yt_downloader_helper import YouTubeDownloadHelper
+from yt_download_helper import YouTubeDownloadHelper
 
 
 class PySyncDJ:
@@ -87,7 +87,6 @@ class PySyncDJ:
                 else:
                     self.logger.info(f"Downloading track: \"{track['track']['name']}\"")
                     track_file_path = self.download_track(track)
-                    set_track_metadata(track, track_file_path)
 
                 rekordbox_playlist.tracks.append(track_file_path)
                 serato_crate.add_track(track_file_path)
@@ -108,6 +107,9 @@ class PySyncDJ:
 
         youtube_video = self.ytd_helper.search_video(f"{track_artist} - {track_name}")
         track_file_path = self.ytd_helper.download_audio(youtube_video, output_path=track_artist)
+
+        set_track_metadata(track, track_file_path)
+
         self.id_to_video_map[track_id] = track_file_path
         save_hashmap_to_json(self.id_to_video_map)
 

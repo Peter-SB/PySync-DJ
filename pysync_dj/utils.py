@@ -56,7 +56,10 @@ def set_track_metadata(track: dir, track_file_path: str) -> None:
     track_data = track["track"]
 
     track_name = track_data["name"]
+
     track_artist = track_data["artists"][0]["name"]
+    track_artists = ", ".join([artist["name"] for artist in track_data["artists"]])
+
     track_popularity = track_data["popularity"]
     track_album = track_data["album"]["name"]
     track_cover_imgs = track_data["album"]["images"]
@@ -64,7 +67,7 @@ def set_track_metadata(track: dir, track_file_path: str) -> None:
     # Basic metadata
     audio.tags = MP4Tags()
     audio["\xa9nam"] = track_name
-    audio["\xa9ART"] = track_artist
+    audio["\xa9ART"] = track_artists
     audio["\xa9alb"] = track_album
     audio["\xa9cmt"] = f"{track_popularity=}"
 
