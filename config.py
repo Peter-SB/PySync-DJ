@@ -10,8 +10,8 @@ tracks_folder = "pysync_dj_tracks"
 download_liked_songs = True  # Not working, keep False
 liked_songs_limit = 100  # How many of your liked songs to download
 playlists_to_download = {
-    "PySync DJ Test": "5lqEAcePNjfTX5KO6FINo6",
     "Nfdnbs24": "2rBDG7m5QcjM3OjHyorkMZ",
     "Jazz n Bass": "6Ch7BrfAM6cTiiBtzONxZR",
     "Chill DnB": "1sbpRux2JYEvosuikC01AY",
+    "Dnb24.1" : "7suQlwliFponAvWaKjyBxC"
 }

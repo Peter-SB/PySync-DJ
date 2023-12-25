@@ -47,6 +47,6 @@ class YouTubeDownloadHelper:
         """
         audio_stream = video.streams.get_audio_only()
         if audio_stream:
-            return audio_stream.download(output_path= os.path.join(self.track_dir, output_path))
+            return audio_stream.download(output_path=os.path.join(self.track_dir, output_path))
         else:
             self.logger.warning(f"No audio stream available for this video {video}")

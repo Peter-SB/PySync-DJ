@@ -1,7 +1,11 @@
 import json
 import logging
 import os
+import re
 from pathlib import Path
+from typing import Optional
+
+import unicodedata
 from mutagen.mp4 import MP4, MP4Cover
 from mutagen.mp4 import MP4Tags
 import requests
@@ -96,3 +100,40 @@ def load_hashmap_from_json(file_path: str = "id_to_video_map.json") -> dict:
             return json.load(file)
     except FileNotFoundError:
         return {}  # Return an empty dictionary if the file does not exist
+
+
+def extract_spotify_playlist_id(url: str) -> Optional[str]:
+    """
+    Extract the Spotify playlist ID from a given URL.
+
+    :param url: The Spotify playlist URL.
+    :return: The extracted playlist ID or None if the URL does not contain a valid ID.
+    """
+    # Pattern to match a sequence of alphanumeric characters which could be a Spotify playlist ID
+    pattern = r'([a-zA-Z0-9]{22})'  # Spotify IDs are 22 characters long
+    match = re.search(pattern, url)
+    return match.group(1) if match else None
+
+
+def sanitize_filename(filename: str, max_length: Optional[int] = 255, replace_spaces: bool = False) -> str:
+    """
+    Sanitize a string to be used as a filename. Removes or replaces characters that are not allowed
+    in filenames and limits the length of the filename.
+
+    :param filename: The string to be sanitized for use as a filename.
+    :param max_length: The maximum allowed length of the filename (default is 255).
+    :param replace_spaces: Should replace spaces with underscores
+    :return: The sanitized filename.
+    """
+    # Normalize Unicode characters to the closest equivalent ASCII character
+    normalized = unicodedata.normalize('NFKD', filename).encode('ascii', 'ignore').decode('ascii')
+
+    # Replace spaces with underscores
+    if replace_spaces:
+        normalized = normalized.replace(" ", "_")
+
+    # Remove or replace characters that are not allowed in filenames
+    sanitized = re.sub(r'[\/\\:*?"<>|]', '', normalized)
+
+    # Limit the length of the filename
+    return sanitized[:max_length]

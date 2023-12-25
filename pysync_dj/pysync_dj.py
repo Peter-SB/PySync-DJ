@@ -5,7 +5,8 @@ import logging
 import config
 from crate import SeratoCrate
 from rekordbox_library import RekordboxLibrary
-from utils import init_logging, LOGGER_NAME, set_track_metadata, load_hashmap_from_json, save_hashmap_to_json
+from utils import init_logging, LOGGER_NAME, set_track_metadata, load_hashmap_from_json, save_hashmap_to_json, \
+    extract_spotify_playlist_id, sanitize_filename
 from spotify_helper import SpotifyHelper
 from yt_downloader_helper import YouTubeDownloadHelper
 
@@ -60,8 +61,9 @@ class PySyncDJ:
             rekordbox_playlist.create_m3u_file(f"E:\\rekordbox_playlist_3mus\\Liked Songs.m3u")
 
     def download_all_playlists(self):
-        for playlist_name, playlist_id in config.playlists_to_download.items():
-            self.logger.info(f"Getting playlist information for playlist {playlist_name=}, {playlist_id=}")
+        for playlist_name, playlist_url in config.playlists_to_download.items():
+            playlist_id = extract_spotify_playlist_id(playlist_url)
+            self.logger.info(f"Getting playlist information for playlist {playlist_name=}, {playlist_url=}, {playlist_id=}")
 
             serato_crate = SeratoCrate(playlist_name)
             rekordbox_playlist = RekordboxLibrary()
@@ -101,7 +103,7 @@ class PySyncDJ:
         :return: The file location of the downloaded track
         """
         track_name = track["track"]["name"]
-        track_artist = track["track"]["artists"][0]["name"]
+        track_artist = sanitize_filename(track["track"]["artists"][0]["name"])
         track_id = track["track"]["id"]
 
         youtube_video = self.ytd_helper.search_video(f"{track_artist} - {track_name}")
