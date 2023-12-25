@@ -1,12 +1,13 @@
 id_to_video_map.json
 
 *.log
-__pycache__/
 *.py[cod]
 *$py.class
-venv/
 *.cache
 
+.idea/
 pysync_dj/id_to_video_map.json
 pysync_dj/__pycache__/
 pysync_dj/.cache
+venv/
+__pycache__/
