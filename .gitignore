@@ -6,3 +6,7 @@ __pycache__/
 *$py.class
 venv/
 *.cache
+
+pysync_dj/id_to_video_map.json
+pysync_dj/__pycache__/
+pysync_dj/.cache
