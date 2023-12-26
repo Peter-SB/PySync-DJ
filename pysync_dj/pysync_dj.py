@@ -2,8 +2,8 @@ import os.path
 from typing import Optional
 import logging
 
-import config
 from crate import SeratoCrate
+from settings import SettingsSingleton
 from rekordbox_library import RekordboxLibrary
 from utils import init_logging, LOGGER_NAME, set_track_metadata, load_hashmap_from_json, save_hashmap_to_json, \
     extract_spotify_playlist_id, sanitize_filename
@@ -27,8 +27,10 @@ class PySyncDJ:
         init_logging()
         self.logger = logging.getLogger(LOGGER_NAME)
 
-        self.spotify_helper = SpotifyHelper(config.spotify_client_id, config.spotify_client_secret)
-        self.ytd_helper = YouTubeDownloadHelper(config.dj_library_directory, config.tracks_folder)
+        self.settings = SettingsSingleton()
+
+        self.spotify_helper = SpotifyHelper(self.settings.spotify_client_id, self.settings.spotify_client_secret)
+        self.ytd_helper = YouTubeDownloadHelper(self.settings.dj_library_directory, self.settings.tracks_folder)
 
         self.id_to_video_map = load_hashmap_from_json()
 
@@ -41,27 +43,27 @@ class PySyncDJ:
         """
         self.logger.info("Starting PySync DJ application.")
 
-        self.download_liked_songs()
+        if self.settings.download_liked_songs:
+            self.download_liked_songs()
         self.download_all_playlists()
 
         self.logger.info("PySync DJ application run completed.")
 
     def download_liked_songs(self):
-        if config.download_liked_songs:
-            self.logger.info(f"Getting liked songs information")
+        self.logger.info(f"Getting liked songs information")
 
-            serato_crate = SeratoCrate("Liked Songs")
-            rekordbox_playlist = RekordboxLibrary()
+        serato_crate = SeratoCrate("Liked Songs")
+        rekordbox_playlist = RekordboxLibrary()
 
-            liked_songs_data = self.spotify_helper.get_liked_tracks(limit=config.liked_songs_limit)
-            self.download_playlist(liked_songs_data, serato_crate, rekordbox_playlist)
+        liked_songs_data = self.spotify_helper.get_liked_tracks(limit=self.settings.liked_songs_limit)
+        self.download_playlist(liked_songs_data, serato_crate, rekordbox_playlist)
 
-            self.logger.info("Saving crate data...")
-            serato_crate.save_crate()
-            rekordbox_playlist.create_m3u_file(f"E:\\rekordbox_playlist_3mus\\Liked Songs.m3u")
+        self.logger.info("Saving crate data...")
+        serato_crate.save_crate()
+        rekordbox_playlist.create_m3u_file(f"E:\\rekordbox_playlist_3mus\\Liked Songs.m3u")
 
     def download_all_playlists(self):
-        for playlist_name, playlist_url in config.playlists_to_download.items():
+        for playlist_name, playlist_url in self.settings.playlists_to_download.items():
             playlist_id = extract_spotify_playlist_id(playlist_url)
             self.logger.info(f"Getting playlist information for playlist {playlist_name=}, {playlist_url=}, {playlist_id=}")
 

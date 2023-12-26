@@ -80,7 +80,7 @@ def set_track_metadata(track: dir, track_file_path: str) -> None:
     audio.save()
 
 
-def save_hashmap_to_json(id_to_video_map: dict, file_path: str = "id_to_video_map.json") -> None:
+def save_hashmap_to_json(id_to_video_map: dict, file_path: str = "../id_to_video_map.json") -> None:
     """
     Save a hashmap to a JSON file.
 
@@ -91,7 +91,7 @@ def save_hashmap_to_json(id_to_video_map: dict, file_path: str = "id_to_video_ma
         json.dump(id_to_video_map, file)
 
 
-def load_hashmap_from_json(file_path: str = "id_to_video_map.json") -> dict:
+def load_hashmap_from_json(file_path: str = "../id_to_video_map.json") -> dict:
     """
     Load a hashmap from a JSON file.
 
