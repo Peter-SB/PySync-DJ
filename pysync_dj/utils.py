@@ -88,7 +88,7 @@ def save_hashmap_to_json(id_to_video_map: dict, file_path: str = "../id_to_video
     :param file_path: The path to the JSON file where the hashmap will be saved.
     """
     with open(file_path, 'w') as file:
-        json.dump(id_to_video_map, file)
+        json.dump(id_to_video_map, file, indent=4)
 
 
 def load_hashmap_from_json(file_path: str = "../id_to_video_map.json") -> dict:

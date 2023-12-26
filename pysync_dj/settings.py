@@ -88,7 +88,7 @@ class SettingsSingleton:
         return self.get_setting('liked_songs_track_limit')
 
     @property
-    def liked_songs_date_limit(self) -> date:
+    def liked_songs_date_limit(self) -> str:
         return self.get_setting('liked_songs_date_limit')
 
     @property

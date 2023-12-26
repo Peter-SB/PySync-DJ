@@ -72,13 +72,18 @@ class SpotifyHelper:
                 if (settings.liked_songs_date_limit
                         and not self.track_added_inside_of_date_limit(track, settings.liked_songs_date_limit)):
                     return liked_songs[:liked_songs_track_limit]
+
                 if liked_songs_track_limit and len(liked_songs) >= liked_songs_track_limit:
                     return liked_songs[:liked_songs_track_limit]
+
                 liked_songs.append(track)
+
             if results['next']:
                 results = sp.next(results)
             else:
-                return liked_songs[:liked_songs_track_limit]
+                break
+
+        return liked_songs[:liked_songs_track_limit]
 
 
     @staticmethod
