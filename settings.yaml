@@ -2,11 +2,13 @@ spotify_client_id: "87a07cc2f67449dea1033ac2edef323f"
 spotify_client_secret: "ea63089c4a8c4e38862eacdaf2aefdfb"
 spotify_redirect_uri: "http://localhost:8888/callback"
 
-dj_library_directory: "E:\\"
-tracks_folder: "pysync_dj_tracks"
+dj_library_directory: "E:\\" # director of your usb and program output
+tracks_folder: "pysync_dj_tracks" # Folder name for location of saved audio
 
-download_liked_songs: true
-liked_songs_limit: 100  # How many of your liked songs to download
+download_liked_songs: true # Should download users liked songs? (true/false)
+liked_songs_track_limit: 100  # How many of your liked songs to download (integer)
+liked_songs_date_limit: 10-10-23 # Date to download back to (DD-MM-YYYY)
+
 playlists_to_download:
   Nfdnbs24: "2rBDG7m5QcjM3OjHyorkMZ"
   Jazz n Bass: "6Ch7BrfAM6cTiiBtzONxZR"

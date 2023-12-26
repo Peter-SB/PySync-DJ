@@ -1,4 +1,6 @@
 import logging
+import os
+
 from utils import LOGGER_NAME
 
 
@@ -17,6 +19,7 @@ class RekordboxLibrary:
         self.tracks = []
 
     def create_m3u_file(self, output_file: str):
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
         with open(output_file, 'w') as playlist:
             playlist.write('#EXTM3U\n')  # Header for an extended M3U file
             for file_location in self.tracks:

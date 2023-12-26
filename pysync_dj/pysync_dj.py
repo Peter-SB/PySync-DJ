@@ -55,7 +55,8 @@ class PySyncDJ:
         serato_crate = SeratoCrate("Liked Songs")
         rekordbox_playlist = RekordboxLibrary()
 
-        liked_songs_data = self.spotify_helper.get_liked_tracks(limit=self.settings.liked_songs_limit)
+        liked_songs_data = self.spotify_helper.get_liked_tracks(self.settings.liked_songs_track_limit,
+                                                                self.settings.liked_songs_date_limit)
         self.download_playlist(liked_songs_data, serato_crate, rekordbox_playlist)
 
         self.logger.info("Saving crate data...")
@@ -75,7 +76,7 @@ class PySyncDJ:
 
             self.logger.info("Saving crate data...")
             serato_crate.save_crate()
-            rekordbox_playlist.create_m3u_file(f"E:\\rekordbox_playlist_3mus\\{playlist_name}.m3u")
+            rekordbox_playlist.create_m3u_file(f"E:\\Rekordbox Playlist Import Files\\{playlist_name}.m3u")
 
     def download_playlist(self,
                           playlist_data: list[dict],
@@ -118,6 +119,12 @@ class PySyncDJ:
         return track_file_path
 
     def track_download_path(self, track: dict) -> Optional[str]:
+        """
+        Checks if a track is in the track database and if its downloaded
+
+        :param track: Spotify track data
+        :return: Track file path or Null if it doesn't exist
+        """
         track_id = track["track"]["id"]
         if track_file_path := self.id_to_video_map.get(track_id):
             if os.path.exists(track_file_path):

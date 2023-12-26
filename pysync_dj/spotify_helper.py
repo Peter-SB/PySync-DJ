@@ -1,11 +1,12 @@
 import json
 import logging
+from datetime import date, datetime
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
 from typing import List, Dict
 
-import config
+from settings import SettingsSingleton
 from utils import LOGGER_NAME
 
 
@@ -17,6 +18,8 @@ class SpotifyHelper:
     def __init__(self, client_id: str, client_secret: str) -> None:
         """
         Initializes the SpotifyHelper with Spotify API credentials.
+
+        # todo: clean up this function, take out client_id and client secret
 
         :param client_id: Spotify Client ID
         :param client_secret: Spotify Client Secret
@@ -41,18 +44,19 @@ class SpotifyHelper:
             tracks.extend(results['items'])
         return tracks
 
-    def get_liked_tracks(self, limit: int) -> List[Dict]:
+    def get_liked_tracks(self, liked_songs_track_limit: int, liked_songs_date_limit: date) -> List[Dict]:
         """
         Retrieves tracks from the users liked list.
 
-        :param limit: the number of tracks to return
+        :param liked_songs_track_limit: the number of tracks to return
         :return: List of tracks in the playlist
         """
+        settings = SettingsSingleton()
 
         auth_manager = SpotifyOAuth(
-            client_id=config.spotify_client_id,
-            client_secret=config.spotify_client_secret,
-            redirect_uri=config.spotify_redirect_uri,
+            client_id=settings.spotify_client_id,
+            client_secret=settings.spotify_client_secret,
+            redirect_uri=settings.spotify_redirect_uri,
             scope="user-library-read"
         )
 
@@ -64,13 +68,33 @@ class SpotifyHelper:
         liked_songs = []
 
         while results:
-            if len(liked_songs) >= limit:
-                break
-            liked_songs.extend(results['items'])
+            for track in results["items"]:
+                if (settings.liked_songs_date_limit
+                        and not self.track_added_inside_of_date_limit(track, settings.liked_songs_date_limit)):
+                    return liked_songs[:liked_songs_track_limit]
+                if liked_songs_track_limit and len(liked_songs) >= liked_songs_track_limit:
+                    return liked_songs[:liked_songs_track_limit]
+                liked_songs.append(track)
             if results['next']:
                 results = sp.next(results)
             else:
-                break
+                return liked_songs[:liked_songs_track_limit]
 
-        return liked_songs[:limit]
 
+    @staticmethod
+    def track_added_inside_of_date_limit(track: dict, liked_songs_date_limit: str) -> bool:
+        """
+        Check if a track was added is within the user specified date limit.
+
+        :param track: The track object to check.
+        :param liked_songs_date_limit: The date limit as a string.
+        :return: True if the song is within the limit, False otherwise.
+        """
+        if not liked_songs_date_limit:
+            return True
+
+        track_added_date = datetime.fromisoformat(track["added_at"].replace('Z', '+00:00')).date()
+        if track_added_date >= track_added_date:
+            return True
+
+        return False

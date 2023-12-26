@@ -1,6 +1,6 @@
 import os
-import config
 import parse_serato_crates as parse_serato_crates
+from settings import SettingsSingleton
 
 
 class SeratoCrate:
@@ -40,7 +40,7 @@ class SeratoCrate:
         """Save the crate to _Serato_-\Subcrates crate folder"""
         subcrate_dir = "_Serato_\Subcrates"
         crate_formatted_name = f"SpotifyDL%%{self.create_name}.crate"
-        file_path = os.path.join(config.dj_library_directory, subcrate_dir, crate_formatted_name)
+        file_path = os.path.join(SettingsSingleton().dj_library_directory, subcrate_dir, crate_formatted_name)
         with open(file_path, 'wb') as f:
             encoded_data = parse_serato_crates.encode_struct(self.get_crate_data())
             f.write(encoded_data)

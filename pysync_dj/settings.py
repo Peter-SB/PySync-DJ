@@ -1,5 +1,6 @@
 import json
 import logging
+from datetime import date, datetime
 
 import yaml
 from typing import Any, Optional
@@ -83,8 +84,12 @@ class SettingsSingleton:
         return self.get_setting('download_liked_songs')
 
     @property
-    def liked_songs_limit(self) -> int:
-        return self.get_setting('liked_songs_limit')
+    def liked_songs_track_limit(self) -> int:
+        return self.get_setting('liked_songs_track_limit')
+
+    @property
+    def liked_songs_date_limit(self) -> date:
+        return self.get_setting('liked_songs_date_limit')
 
     @property
     def playlists_to_download(self) -> dict[str, str]:
