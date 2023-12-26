@@ -93,8 +93,10 @@ class SpotifyHelper:
         if not liked_songs_date_limit:
             return True
 
+        liked_songs_date_limit = datetime.strptime(liked_songs_date_limit, '%d-%m-%y').date()
         track_added_date = datetime.fromisoformat(track["added_at"].replace('Z', '+00:00')).date()
-        if track_added_date >= track_added_date:
+
+        if track_added_date >= liked_songs_date_limit:
             return True
 
         return False

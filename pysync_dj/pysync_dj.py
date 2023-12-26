@@ -32,6 +32,7 @@ class PySyncDJ:
         self.spotify_helper = SpotifyHelper(self.settings.spotify_client_id, self.settings.spotify_client_secret)
         self.ytd_helper = YouTubeDownloadHelper(self.settings.dj_library_directory, self.settings.tracks_folder)
 
+        self.logger.info(f"Loading track database")
         self.id_to_video_map = load_hashmap_from_json()
 
     def run(self):
