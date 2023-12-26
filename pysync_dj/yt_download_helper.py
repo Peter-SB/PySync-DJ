@@ -2,6 +2,7 @@ import logging
 import os
 from typing import Optional
 from pytube import Search, YouTube
+from pytube.exceptions import VideoUnavailable
 
 from utils import LOGGER_NAME
 
@@ -37,16 +38,38 @@ class YouTubeDownloadHelper:
             self.logger.warning(f"No search results for {search_query}")
             return None
 
-    def download_audio(self, video: YouTube, output_path: Optional[str] = None) -> str:
+    def search_video_url(self, search_url: str) -> Optional[YouTube]:
+        """
+        Searches YouTube for the given url and returns the first search result or None if no results were found.
+
+        :param search_url: The url string for the YouTube video.
+        :return: YouTube video found (or None).
+        """
+        video = YouTube(search_url)
+        try:
+            video_title = video.title
+            self.logger.debug(f"Found video from url {video_title=}")
+            return video
+        except:
+            self.logger.warning(f"No search results for {search_url}")
+            return None
+
+    def download_audio(self, video: YouTube) -> str:
         """
         Downloads the highest quality audio stream of the given YouTube video.
 
         :param video: The YouTube video object to download the audio from.
-        :param output_path: The path to save the downloaded audio file. This will be the artists name.
         :return: file path
         """
+
+        def override_exists_at_path(file_path: str) -> bool:
+            return (
+                    os.path.isfile(file_path)
+            )
+
         audio_stream = video.streams.get_audio_only()
         if audio_stream:
-            return audio_stream.download(output_path=os.path.join(self.track_dir, output_path))
+            audio_stream.exists_at_path = override_exists_at_path
+            return audio_stream.download(output_path=self.track_dir)
         else:
             self.logger.warning(f"No audio stream available for this video {video}")

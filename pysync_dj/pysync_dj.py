@@ -56,8 +56,7 @@ class PySyncDJ:
         serato_crate = SeratoCrate("Liked Songs")
         rekordbox_playlist = RekordboxLibrary()
 
-        liked_songs_data = self.spotify_helper.get_liked_tracks(self.settings.liked_songs_track_limit,
-                                                                self.settings.liked_songs_date_limit)
+        liked_songs_data = self.spotify_helper.get_liked_tracks()
         self.download_playlist(liked_songs_data, serato_crate, rekordbox_playlist)
 
         self.logger.info("Saving crate data...")
@@ -86,11 +85,7 @@ class PySyncDJ:
 
         for track in playlist_data:
             try:
-                if track_file_path := self.track_download_path(track):
-                    self.logger.info(f"Skipping track\"{track['track']['name']}\" as it is already downloaded")
-                else:
-                    self.logger.info(f"Downloading track: \"{track['track']['name']}\"")
-                    track_file_path = self.download_track(track)
+                track_file_path = self.process_spotify_track(track)
 
                 rekordbox_playlist.tracks.append(track_file_path)
                 serato_crate.add_track(track_file_path)
@@ -98,20 +93,43 @@ class PySyncDJ:
             except Exception as e:
                 self.logger.warning(f"Error, {e}")
 
-    def download_track(self, track: dir) -> str:
+    def process_spotify_track(self, track):
+        track_id = track["track"]["id"]
+        track_file_path = self.id_to_video_map.get(track_id)
+
+        # If the file paths is not a custom url and the file is downloaded, skip
+        track_file_path_is_url = "youtube.com/" in track_file_path
+        if not track_file_path_is_url and os.path.exists(track_file_path):
+            self.logger.info(f"Skipping track\"{track['track']['name']}\" as it is already downloaded")
+            return track_file_path
+
+        # If the file path is a custom url, download the track
+        if track_file_path_is_url:
+            self.logger.info(f"Downloading track: \"{track['track']['name']}\" from custom url {track_file_path}")
+            return self.download_track(track, track_file_path)
+
+        # If there is no file path in the database, download the track
+        self.logger.info(f"Downloading track: \"{track['track']['name']}\"")
+        return self.download_track(track)
+
+    def download_track(self, track: dir, custom_yt_url: str = None) -> str:
         """
         Takes a spotify track and downloads it from YouTube.
 
         :param track: Spotify track to download
+        :param custom_yt_url: A url for a video to be used instead of a YouTube search
         :return: The file location of the downloaded track
         """
         track_name = track["track"]["name"]
         track_artist = sanitize_filename(track["track"]["artists"][0]["name"])
         track_id = track["track"]["id"]
 
-        youtube_video = self.ytd_helper.search_video(f"{track_artist} - {track_name}")
-        track_file_path = self.ytd_helper.download_audio(youtube_video, output_path=track_artist)
+        if custom_yt_url:
+            youtube_video = self.ytd_helper.search_video_url(custom_yt_url)
+        else:
+            youtube_video = self.ytd_helper.search_video(f"{track_artist} - {track_name}")
 
+        track_file_path = self.ytd_helper.download_audio(youtube_video)
         set_track_metadata(track, track_file_path)
 
         self.id_to_video_map[track_id] = track_file_path

@@ -44,11 +44,10 @@ class SpotifyHelper:
             tracks.extend(results['items'])
         return tracks
 
-    def get_liked_tracks(self, liked_songs_track_limit: int, liked_songs_date_limit: date) -> List[Dict]:
+    def get_liked_tracks(self) -> List[Dict]:
         """
         Retrieves tracks from the users liked list.
 
-        :param liked_songs_track_limit: the number of tracks to return
         :return: List of tracks in the playlist
         """
         settings = SettingsSingleton()
@@ -71,10 +70,10 @@ class SpotifyHelper:
             for track in results["items"]:
                 if (settings.liked_songs_date_limit
                         and not self.track_added_inside_of_date_limit(track, settings.liked_songs_date_limit)):
-                    return liked_songs[:liked_songs_track_limit]
+                    return liked_songs[:settings.liked_songs_track_limit]
 
-                if liked_songs_track_limit and len(liked_songs) >= liked_songs_track_limit:
-                    return liked_songs[:liked_songs_track_limit]
+                if settings.liked_songs_track_limit and len(liked_songs) >= settings.liked_songs_track_limit:
+                    return liked_songs[:settings.liked_songs_track_limit]
 
                 liked_songs.append(track)
 
