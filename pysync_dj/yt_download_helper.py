@@ -1,10 +1,13 @@
 import logging
 import os
 import re
+import subprocess
 from typing import Optional
 
 import pytube.helpers
 import unicodedata
+from moviepy.audio.io.AudioFileClip import AudioFileClip
+from moviepy.video.io.VideoFileClip import VideoFileClip
 from pytube import Search, YouTube
 from pytube.exceptions import VideoUnavailable
 
@@ -115,8 +118,21 @@ class YouTubeDownloadHelper:
             audio_stream.exists_at_path = override_exists_at_path
             file_name = self._remove_diacritics(audio_stream.default_filename)
             file_name = self._safe_filename(file_name)
-            return audio_stream.download(filename=file_name, output_path=self.track_dir)
+            file_path = audio_stream.download(filename=file_name, output_path=self.track_dir)
+            return self.convert_to_mp3(file_path)
         else:
             self.logger.warning(f"No audio stream available for this video {video}")
 
+    @staticmethod
+    def convert_to_mp3(mp4_file: str) -> str:
+        """
+    Convert an MP4 file to MP3 format, delete the original MP4 file, and return the name of the MP3 file.
+
+        :param mp4_file: The path to the MP4 file.
+        :return: The path of the created MP3 file.
+        """
+        mp3_file = os.path.splitext(mp4_file)[0] + '.mp3'
+        yield mp3_file
+
+        subprocess.run(['python', 'convert_script.py', mp4_file], check=True)
 
