@@ -1,0 +1,11 @@
+*.log
+*.py[cod]
+*$py.class
+*.cache
+
+.idea/
+id_to_video_map.json
+pysync_dj/__pycache__/
+pysync_dj/.cache
+venv/
+__pycache__/

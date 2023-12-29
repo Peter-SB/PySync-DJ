@@ -1,0 +1,36 @@
+import logging
+import os
+
+from settings import SettingsSingleton
+from utils import LOGGER_NAME
+
+
+class RekordboxLibrary:
+    """
+    Helper class for creating M3U playlist files compatible with Rekordbox.
+    """
+
+    def __init__(self) -> None:
+        """
+        Initialize the RekordboxLibrary class.
+        """
+        self.logger = logging.getLogger(LOGGER_NAME)
+        self.tracks = []
+
+    def create_m3u_file(self, output_file_name: str) -> None:
+        """
+        Create an M3U file with the currently added tracks. The file is saved in the directory specified in the
+        SettingsSingleton.
+
+        :param output_file_name: The name of the output M3U file.
+        """
+        output_file = os.path.join(SettingsSingleton().dj_library_directory,
+                                   SettingsSingleton().rekordbox_playlist_folder,
+                                   output_file_name)
+
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+
+        with open(output_file, 'w') as playlist:
+            playlist.write('#EXTM3U\n')  # Header for an extended M3U file
+            for file_location in self.tracks:
+                playlist.write(file_location + '\n')
