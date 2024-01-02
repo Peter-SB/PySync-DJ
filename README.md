@@ -84,3 +84,15 @@ Contributions to PySync DJ are welcome.
 Special thanks to the developers of the used libraries, especially Pytube but also including Spotipy and others listed in requirements.txt.
 
 Thanks also to kerrickstaley for their parse_serato_crates.py code.
+
+## ** Disclaimer ** 
+This software, is developed solely for personal, non-commercial use. It is intended for research and skill development purposes only. Users must adhere to the following:
+
+1. Compliance: Use PySync DJ in accordance with Spotify's and YouTube's Terms of Service. 
+2. Non-commercial Use: PySync DJ is strictly for non-commercial, educational purposes.
+3. No Liability: The developer is not liable for misuse of PySync DJ or violations of any terms of service.
+4. User Responsibility: Users are responsible for their actions and any consequences while using PySync DJ.
+
+This disclaimer is subject to change. Users are responsible for complying with current terms of all involved platforms.
+
+
