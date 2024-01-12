@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Optional
 
 import unicodedata
+from mutagen.id3 import TIT2, TPE1, TALB, COMM, ID3, APIC
+from mutagen.mp3 import MP3
 from mutagen.mp4 import MP4, MP4Cover
 from mutagen.mp4 import MP4Tags
 import requests
@@ -42,7 +44,7 @@ def init_logging(file_name: str = "logs/pysync_dj.log") -> None:
     logger.addHandler(ch)
 
 
-def set_track_metadata(track: dir, track_file_path: str) -> None:
+def set_track_metadata_mp4(track: dir, track_file_path: str) -> None:
     """
     Adds metadata from the spotify track data to the mp4 audio file including cover art if avalible.
 
@@ -74,6 +76,48 @@ def set_track_metadata(track: dir, track_file_path: str) -> None:
         response = requests.get(track_cover_imgs[1]["url"])
         if response.status_code == 200:
             audio["covr"] = [MP4Cover(response.content, imageformat=MP4Cover.FORMAT_JPEG)]
+
+    audio.save()
+
+
+def set_track_metadata(track: dict, track_file_path: str) -> None:
+    """
+    Adds metadata from the Spotify track data to the MP3 audio file, including cover art if available.
+
+    :param track: Track data from Spotify.
+    :param track_file_path: Path to the MP3 audio file.
+    """
+    audio = MP3(track_file_path, ID3=ID3)
+
+    track_data = track["track"]
+    track_name = track_data["name"]
+    track_artist = track_data["artists"][0]["name"]
+    track_artists = ", ".join([artist["name"] for artist in track_data["artists"]])
+    track_popularity = track_data["popularity"]
+    track_album = track_data["album"]["name"]
+    track_cover_imgs = track_data["album"]["images"]
+
+    # Basic metadata
+    audio['TIT2'] = TIT2(encoding=3, text=track_name)
+    audio['TPE1'] = TPE1(encoding=3, text=track_artists)
+    audio['TALB'] = TALB(encoding=3, text=track_album)
+    audio['COMM'] = COMM(encoding=3, lang='eng', desc=f'Popularity = {track_popularity}', text=f"{track_popularity}")  # todo: Needs fixing after mp3 update
+
+    audio.save()
+
+    audio = ID3(track_file_path)
+
+    # Adding cover art
+    if track_cover_imgs:
+        response = requests.get(track_cover_imgs[0]["url"])
+        if response.status_code == 200:
+            audio['APIC'] = APIC(
+                encoding=3,
+                mime='image/jpeg',
+                type=3,  # Cover image
+                desc=u'Cover',
+                data=response.content
+            )
 
     audio.save()
 
