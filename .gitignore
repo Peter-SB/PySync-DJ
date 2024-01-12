@@ -9,3 +9,4 @@ pysync_dj/__pycache__/
 pysync_dj/.cache
 venv/
 __pycache__/
+settings.yaml

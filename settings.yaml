@@ -1,18 +1,16 @@
-spotify_client_id: "87a07cc2f67449dea1033ac2edef323f"
-spotify_client_secret: "ea63089c4a8c4e38862eacdaf2aefdfb"
-spotify_redirect_uri: "http://localhost:8888/callback"
+spotify_client_id: "" # Google how to get this value
+spotify_client_secret: ""
+spotify_redirect_uri: "http://localhost:8888/callback" # leave as is
 
-dj_library_directory: "D:\\" # director of your usb and program output
-tracks_folder: "PySync Dj Tracks" # Folder name for location of saved audio files
+dj_library_directory: "E:\\" # Director of your usb and program output
+tracks_folder: "Pysync_d DJ Tracks" # Folder name for location of saved audio files
 serato_subcrate_dir: "_Serato_\\Subcrates" # Location of your serato subcrates
-rekordbox_playlist_folder: "_Rekordbox Playlist Import Files_" # Folder name for location of saved rekordbox m3u files
+rekordbox_playlist_folder: "Rekordbox Playlist Import Files" # Folder name for location of saved rekordbox m3u files
 
 download_liked_songs: true # Should download users liked songs? (true/false)
 liked_songs_track_limit: 50  # How many of your liked songs to download (integer)
-liked_songs_date_limit: 01-05-23 # Date to download back to (DD-MM-YYYY)
+liked_songs_date_limit: null # Date to download back to (DD-MM-YYYY)
 
 playlists_to_download:
-  Nfdnbs24: "2rBDG7m5QcjM3OjHyorkMZ"
-  #Jazz n Bass: "6Ch7BrfAM6cTiiBtzONxZR"
-  #Chill DnB: "1sbpRux2JYEvosuikC01AY"
-  Dnb24.1: "7suQlwliFponAvWaKjyBxC"
+  PLaylist1: "2rBDG7m5QcjM3OjHyorkMZ" # Can use either just playlist id
+  Playlist2: "https://open.spotify.com/playlist/2rBDG7m5QcjM3OjHyorkMZ" # or full url
