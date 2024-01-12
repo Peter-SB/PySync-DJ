@@ -38,7 +38,7 @@ spotify_client_id: "" # Google how to get this value
 spotify_client_secret: ""
 spotify_redirect_uri: "http://localhost:8888/callback" # leave as is
 
-dj_library_directory: "E:\\" # Director of your usb and program output
+dj_library_directory: "E:\\" # Directory of your usb and program output
 tracks_folder: "Pysync_d DJ Tracks" # Folder name for location of saved audio files
 serato_subcrate_dir: "_Serato_\\Subcrates" # Location of your serato subcrates
 rekordbox_playlist_folder: "Rekordbox Playlist Import Files" # Folder name for location of saved rekordbox m3u files
