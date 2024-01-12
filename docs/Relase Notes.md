@@ -1,10 +1,8 @@
 # Release Notes
 
----
-
 ## Release 1.1 - Save As MP3 
 
-This update introduces MP4 to MP3 conversion after the audio files are downloaded. This is because CDJs can read MP4 files. The files are converted with python library moviepy. 
+This update introduces MP4 to MP3 conversion after the audio files are downloaded. This is because CDJs can't read MP4 files. The files now are converted to mp3. This is done with python library moviepy. 
 The settings file was also updated (and the spotify client secret refreshed) for security and readability. 
 
 ### Features
