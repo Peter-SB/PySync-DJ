@@ -101,20 +101,22 @@ def set_track_metadata(track: dict, track_file_path: str) -> None:
     audio['TIT2'] = TIT2(encoding=3, text=track_name)
     audio['TPE1'] = TPE1(encoding=3, text=track_artists)
     audio['TALB'] = TALB(encoding=3, text=track_album)
-    audio['COMM'] = COMM(encoding=3, lang='eng', desc='Popularity', text=str(track_popularity))
+    audio['COMM'] = COMM(encoding=3, lang='eng', desc=f'Popularity = {track_popularity}', text=f"{track_popularity}")  # todo: Needs fixing after mp3 update
+
+    audio.save()
+
+    audio = ID3(track_file_path)
 
     # Adding cover art
     if track_cover_imgs:
         response = requests.get(track_cover_imgs[0]["url"])
         if response.status_code == 200:
-            audio.tags.add(
-                APIC(
-                    encoding=3,
-                    mime='image/jpeg',
-                    type=3,  # Cover image
-                    desc=u'Cover',
-                    data=response.content
-                )
+            audio['APIC'] = APIC(
+                encoding=3,
+                mime='image/jpeg',
+                type=3,  # Cover image
+                desc=u'Cover',
+                data=response.content
             )
 
     audio.save()

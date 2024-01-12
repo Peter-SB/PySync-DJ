@@ -1,7 +1,6 @@
 import logging
 import os
 import re
-import subprocess
 from typing import Optional
 
 import pytube.helpers
@@ -111,7 +110,8 @@ class YouTubeDownloadHelper:
         # Override this function to avoid Streams doing a file size check which will here always be different from raw
         # file, I assume due to metadata (image including) on audio files.
         def override_exists_at_path(file_path: str) -> bool:
-            return os.path.isfile(file_path)
+            mp3_file_path = os.path.splitext(file_path)[0] + '.mp3'
+            return os.path.isfile(mp3_file_path)
 
         audio_stream = video.streams.get_audio_only()
         if audio_stream:
@@ -126,13 +126,18 @@ class YouTubeDownloadHelper:
     @staticmethod
     def convert_to_mp3(mp4_file: str) -> str:
         """
-    Convert an MP4 file to MP3 format, delete the original MP4 file, and return the name of the MP3 file.
+        Convert an MP4 file to MP3 format, delete the original MP4 file, and return the name of the MP3 file.
 
         :param mp4_file: The path to the MP4 file.
         :return: The path of the created MP3 file.
         """
         mp3_file = os.path.splitext(mp4_file)[0] + '.mp3'
-        yield mp3_file
 
-        subprocess.run(['python', 'convert_script.py', mp4_file], check=True)
+        video_clip = AudioFileClip(mp4_file)
+        video_clip.write_audiofile(mp3_file)
+        video_clip.close()
 
+        # Delete the original MP4 file
+        os.remove(mp4_file)
+
+        return mp3_file
