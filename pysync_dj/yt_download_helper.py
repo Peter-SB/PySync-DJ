@@ -69,7 +69,6 @@ class YouTubeDownloadHelper:
         # Filter out non-ASCII characters
         return ''.join(c for c in normalized if unicodedata.category(c) != 'Mn' and ord(c) < 128)
 
-
     def search_video(self, search_query: str) -> Optional[YouTube]:
         """
         Search YouTube with the given query and return the first video result.

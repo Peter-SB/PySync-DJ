@@ -99,7 +99,7 @@ class PySyncDJ:
 
         downloaded_tracks = []
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
+        with concurrent.futures.ProcessPoolExecutor() as executor:
             future_to_track = [executor.submit(process_track, track_data, lock, self.settings) for track_data in playlist_data]
             for future in concurrent.futures.as_completed(future_to_track):
                 try:
