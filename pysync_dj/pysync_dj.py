@@ -2,6 +2,9 @@ import os.path
 from typing import Optional
 import logging
 
+import queue
+import multiprocessing
+
 from crate import SeratoCrate
 from settings import SettingsSingleton
 from rekordbox_library import RekordboxLibrary
@@ -75,39 +78,69 @@ class PySyncDJ:
             playlist_id = extract_spotify_playlist_id(playlist_url)
             self.logger.info(f"Getting playlist information for playlist {playlist_name=}, {playlist_url=}, {playlist_id=}")
 
-            serato_crate = SeratoCrate(playlist_name)
-            rekordbox_playlist = RekordboxLibrary()
-
             playlist_data = self.spotify_helper.get_playlist_tracks(playlist_id)
-            self.download_playlist(playlist_data, serato_crate, rekordbox_playlist)
+            downloaded_track_list = self.download_playlist(playlist_data)
 
             self.logger.info("Saving crate data...")
-            serato_crate.save_crate()
-            rekordbox_playlist.create_m3u_file(f"{playlist_name}.m3u")
+            SeratoCrate(playlist_name, downloaded_track_list)
+            RekordboxLibrary(playlist_name, downloaded_track_list)
 
     def download_playlist(self,
-                          playlist_data: list[dict],
-                          serato_crate: SeratoCrate,
-                          rekordbox_playlist: RekordboxLibrary) -> None:
+                          playlist_data: list[dict]) -> list[str]:
         """
         Downloads tracks from a given playlist and updates the Serato crate and Rekordbox playlist objects.
 
         :param playlist_data: List of dictionaries containing playlist track data.
-        :param serato_crate: The Serato crate to update with downloaded tracks.
-        :param rekordbox_playlist: The Rekordbox playlist to update with downloaded tracks.
+        :return:
         """
 
-        for track in playlist_data:
-            try:
-                track_file_path = self.process_spotify_track(track)
+        track_queue = multiprocessing.JoinableQueue()
+        for index, track in enumerate(playlist_data):
+            track_queue.put((index, track))
 
-                rekordbox_playlist.tracks.append(track_file_path)
-                serato_crate.add_track(track_file_path)
+        id_video_map_lock = multiprocessing.Lock()
+
+        manager = multiprocessing.Manager()
+        ordered_downloaded_track_list = manager.dict()
+
+        consumers = [multiprocessing.Process(
+            target=self.track_consumer, args=(track_queue, id_video_map_lock, ordered_downloaded_track_list)
+        ) for i in range(3)]
+
+        for c in consumers:
+            c.start()
+
+        track_queue.join()
+
+        for c in consumers:
+            c.terminate()
+            c.join()
+
+        # Save track lists
+        processed_items = [ordered_downloaded_track_list.get() for _ in range(len(ordered_downloaded_track_list))]
+        processed_items.sort(key=lambda x: x[0])  # Sort by index
+
+        downloaded_track_list = []
+        return downloaded_track_list
+
+    def track_consumer(self, input_queue: multiprocessing.JoinableQueue, lock, output_queue):
+        while True:
+            try:
+                index, track = input_queue.get()
+
+                track_file_path = self.process_spotify_track(track, lock)
+
+                output_queue.put((index, track_file_path))
+                input_queue.task_done()
+
+            except queue.Empty:
+                break  # Exit if no item is found within the timeout
 
             except Exception as e:
                 self.logger.warning(f"Error, {e}")
 
-    def process_spotify_track(self, track: dir) -> str:
+
+    def process_spotify_track(self, track: dir, lock) -> str:
         """
         Checks if a spotify track has already been downloaded, if it has a custom URL, or if it needs to be downloaded.
 
@@ -118,8 +151,9 @@ class PySyncDJ:
         track_file_path = self.id_to_video_map.get(track_id)
 
         if track_file_path:
-            # If the file paths is not a custom url and the file is downloaded, skip
             track_file_path_is_url = "youtube.com/" in track_file_path
+
+            # If the file paths is not a custom url and the file is downloaded, skip
             if not track_file_path_is_url and os.path.exists(track_file_path):
                 self.logger.info(f"Skipping track\"{track['track']['name']}\" as it is already downloaded")
                 return track_file_path

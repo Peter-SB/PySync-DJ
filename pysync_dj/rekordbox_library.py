@@ -10,12 +10,13 @@ class RekordboxLibrary:
     Helper class for creating M3U playlist files compatible with Rekordbox.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, playlist_name, downloaded_track_list) -> None:
         """
         Initialize the RekordboxLibrary class.
         """
         self.logger = logging.getLogger(LOGGER_NAME)
-        self.tracks = []
+        self.tracks = downloaded_track_list
+        self.create_m3u_file(f"{playlist_name}.m3u")
 
     def create_m3u_file(self, output_file_name: str) -> None:
         """
