@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from typing import Tuple, Any, Union
@@ -6,25 +7,18 @@ from utils import LOGGER_NAME, sanitize_filename, load_hashmap_from_json, set_tr
 from yt_download_helper import YouTubeDownloadHelper
 
 
-def process_track(track_data, lock, settings):
-    track_consumer = TrackProcessor(track_data, lock, settings)
-    return track_consumer.start_processing()
+def process_track(track_data, lock, settings, id_to_video_map):
+    track_consumer = TrackProcessor(track_data, lock, settings, id_to_video_map)
+    return track_consumer.process_spotify_track(track_data)
 
 
 class TrackProcessor:
-    def __init__(self, track_data, lock, settings):
+    def __init__(self, track_data, lock, settings, id_to_video_map):
         self.logger = logging.getLogger(LOGGER_NAME)
         self.ytd_helper = YouTubeDownloadHelper(settings.dj_library_directory, settings.tracks_folder)
         self.track_data = track_data
-
-        with lock:
-            self.id_to_video_map = load_hashmap_from_json()
-
-    def start_processing(self):
-        try:
-            return self.process_spotify_track(self.track_data)
-        except Exception as e:
-            self.logger.warning(f"Error, {e}")
+        self.lock = lock
+        self.id_to_video_map = id_to_video_map
 
     def process_spotify_track(self, track: dir):
         """
@@ -72,5 +66,9 @@ class TrackProcessor:
 
         track_file_path = self.ytd_helper.download_audio(youtube_video)
         set_track_metadata(track, track_file_path)
+
+        with self.lock:
+            self.id_to_video_map[track_id] = track_file_path
+            save_hashmap_to_json(dict(self.id_to_video_map))
 
         return track_file_path, track_id

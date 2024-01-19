@@ -1,5 +1,6 @@
 import concurrent.futures
 import os.path
+import traceback
 from typing import Optional
 import logging
 
@@ -36,8 +37,7 @@ class PySyncDJ:
         self.spotify_helper = SpotifyHelper()
         self.ytd_helper = YouTubeDownloadHelper(self.settings.dj_library_directory, self.settings.tracks_folder)
 
-        self.logger.info(f"Loading local track database")
-        self.id_to_video_map = load_hashmap_from_json()
+        #self.logger.info(f"Loading local track database")
 
     def run(self):
         """
@@ -95,23 +95,21 @@ class PySyncDJ:
         """
 
         manager = multiprocessing.Manager()
+        id_to_video_map = manager.dict(load_hashmap_from_json())
         lock = manager.Lock()
 
         downloaded_tracks = []
 
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            future_to_track = [executor.submit(process_track, track_data, lock, self.settings) for track_data in playlist_data]
+            future_to_track = [executor.submit(process_track, track_data, lock, self.settings, id_to_video_map) for track_data in playlist_data]
             for future in concurrent.futures.as_completed(future_to_track):
                 try:
                     track_file_path, track_id = future.result()
                     downloaded_tracks.append(track_file_path)
 
-                    with lock:
-                        self.id_to_video_map[track_id] = track_file_path
-                        save_hashmap_to_json(self.id_to_video_map)
-
                 except Exception as e:
-                    print(e)
+                    print(f"E {e}")
+                    print(traceback.format_exc())
 
         return downloaded_tracks
 
