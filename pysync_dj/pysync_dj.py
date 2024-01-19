@@ -104,7 +104,7 @@ class PySyncDJ:
             future_to_track = [executor.submit(process_track, track_data, lock, self.settings, id_to_video_map) for track_data in playlist_data]
             for future in concurrent.futures.as_completed(future_to_track):
                 try:
-                    track_file_path, track_id = future.result()
+                    track_file_path = future.result()
                     downloaded_tracks.append(track_file_path)
 
                 except Exception as e:
