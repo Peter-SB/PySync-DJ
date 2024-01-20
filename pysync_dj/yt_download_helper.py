@@ -118,7 +118,7 @@ class YouTubeDownloadHelper:
             file_name = self._remove_diacritics(audio_stream.default_filename)
             file_name = self._safe_filename(file_name)
             file_path = audio_stream.download(filename=file_name, output_path=self.track_dir)
-            return self.convert_to_mp3(file_path) # todo: fix dont convert if mp3 found
+            return self.convert_to_mp3(file_path) # todo: fix dont convert if mp3 found. Because mp4 not exists
         else:
             self.logger.warning(f"No audio stream available for this video {video}")
 
