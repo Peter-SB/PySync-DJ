@@ -25,7 +25,7 @@ class RekordboxLibrary:
 
         :param output_file_name: The name of the output M3U file.
         """
-        output_file = os.path.join(SettingsSingleton().dj_library_directory,
+        output_file = os.path.join(SettingsSingleton().dj_library_drive,
                                    SettingsSingleton().rekordbox_playlist_folder,
                                    output_file_name)
 

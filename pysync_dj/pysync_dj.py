@@ -8,10 +8,10 @@ import queue
 import multiprocessing
 
 from track_processor import process_track
-from crate import SeratoCrate
+from serato_crate import SeratoCrate
 from settings import SettingsSingleton
 from rekordbox_library import RekordboxLibrary
-from utils import init_logging, LOGGER_NAME, set_track_metadata, load_hashmap_from_json, save_hashmap_to_json, \
+from utils import init_logging, LOGGER_NAME, set_track_metadata, load_hashmap_from_json, \
     extract_spotify_playlist_id, sanitize_filename
 from spotify_helper import SpotifyHelper
 from yt_download_helper import YouTubeDownloadHelper
@@ -35,7 +35,7 @@ class PySyncDJ:
         self.settings = SettingsSingleton()
 
         self.spotify_helper = SpotifyHelper()
-        self.ytd_helper = YouTubeDownloadHelper(self.settings.dj_library_directory, self.settings.tracks_folder)
+        self.ytd_helper = YouTubeDownloadHelper(self.settings.dj_library_drive, self.settings.tracks_folder)
 
         #self.logger.info(f"Loading local track database")
 
@@ -91,20 +91,26 @@ class PySyncDJ:
         Downloads tracks from a given playlist and updates the Serato crate and Rekordbox playlist objects.
 
         :param playlist_data: List of dictionaries containing playlist track data.
-        :return:
+        :return: List of downloaded tack's file paths.
         """
 
         manager = multiprocessing.Manager()
-        id_to_video_map = manager.dict(load_hashmap_from_json())
+        id_to_video_map = manager.dict(load_hashmap_from_json(self.settings.dj_library_drive))
         lock = manager.Lock()
 
         downloaded_tracks = []
 
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            future_to_track = [executor.submit(process_track, track_data, lock, self.settings, id_to_video_map) for track_data in playlist_data]
-            for future in concurrent.futures.as_completed(future_to_track):
+            track_processors = [executor.submit(
+                process_track,
+                track_data,
+                lock,
+                self.settings,
+                id_to_video_map,
+                self.logger) for track_data in playlist_data]
+            for track_processor in concurrent.futures.as_completed(track_processors):
                 try:
-                    track_file_path = future.result()
+                    track_file_path = track_processor.result()
                     downloaded_tracks.append(track_file_path)
 
                 except Exception as e:

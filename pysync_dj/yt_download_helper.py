@@ -132,6 +132,9 @@ class YouTubeDownloadHelper:
         """
         mp3_file = os.path.splitext(mp4_file)[0] + '.mp3'
 
+        if os.path.isfile(mp3_file):
+            return mp3_file
+
         video_clip = AudioFileClip(mp4_file)
         video_clip.write_audiofile(mp3_file)
         video_clip.close()

@@ -1,27 +1,34 @@
-import json
-import logging
 import os
-from typing import Tuple, Any, Union
 
-from utils import LOGGER_NAME, sanitize_filename, load_hashmap_from_json, set_track_metadata, save_hashmap_to_json
+from utils import sanitize_filename, set_track_metadata, save_hashmap_to_json
 from yt_download_helper import YouTubeDownloadHelper
 
 
-def process_track(track_data, lock, settings, id_to_video_map):
-    track_consumer = TrackProcessor(track_data, lock, settings, id_to_video_map)
+def process_track(track_data, lock, settings, id_to_video_map, logger) -> str:
+    """
+    Initializes a track processor class and processes the track
+
+    :param track_data: Track data from Spotify API.
+    :param lock: Lock used for safely saving id_to_video_map.
+    :param settings: Users settings.
+    :param id_to_video_map:
+    :param logger:
+    :return: Downloaded track's file path
+    """
+    track_consumer = TrackProcessor(track_data, lock, settings, id_to_video_map, logger)
     return track_consumer.process_spotify_track(track_data)
 
 
 class TrackProcessor:
-    def __init__(self, track_data, lock, settings, id_to_video_map):
-        self.logger = logging.getLogger(LOGGER_NAME)
-        self.ytd_helper = YouTubeDownloadHelper(settings.dj_library_directory, settings.tracks_folder)
+    def __init__(self, track_data, lock, settings, id_to_video_map, logger):
+        self.logger = logger
+        self.ytd_helper = YouTubeDownloadHelper(settings.dj_library_drive, settings.tracks_folder)
         self.track_data = track_data
         self.lock = lock
         self.id_to_video_map = id_to_video_map
         self.settings = settings
 
-    def process_spotify_track(self, track: dir):
+    def process_spotify_track(self, track: dir) -> str:
         """
         Checks if a spotify track has already been downloaded, if it has a custom URL, or if it needs to be downloaded.
 
@@ -33,7 +40,7 @@ class TrackProcessor:
 
         if track_file_path:
             track_file_path_is_url = "youtube.com/" in track_file_path
-            track_file_path_with_drive = os.path.join(self.settings.dj_library_directory, track_file_path)
+            track_file_path_with_drive = os.path.join(self.settings.dj_library_drive, track_file_path)
 
             # If the file paths is not a custom url and the file is downloaded, skip
             if not track_file_path_is_url and os.path.exists(track_file_path_with_drive):
@@ -49,7 +56,7 @@ class TrackProcessor:
         self.logger.info(f"Downloading track: \"{track['track']['name']}\"")
         return self.download_track(track)
 
-    def download_track(self, track: dir, custom_yt_url: str = None):
+    def download_track(self, track: dir, custom_yt_url: str = None) -> str:
         """
         Takes a spotify track and downloads it from YouTube.
 
@@ -71,6 +78,6 @@ class TrackProcessor:
 
         with self.lock:
             self.id_to_video_map[track_id] = os.path.splitdrive(track_file_path)[1]
-            save_hashmap_to_json(dict(self.id_to_video_map))
+            save_hashmap_to_json(dict(self.id_to_video_map), self.settings.dj_library_drive)
 
         return track_file_path

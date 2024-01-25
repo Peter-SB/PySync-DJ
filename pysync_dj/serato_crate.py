@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Tuple, List
 import parse_serato_crates as parse_serato_crates
 from settings import SettingsSingleton
@@ -64,7 +65,8 @@ class SeratoCrate:
         settings = SettingsSingleton()
 
         crate_formatted_name = f"PySync DJ%%{self.crate_name}.crate"
-        file_path = os.path.join(settings.dj_library_directory, settings.serato_subcrate_dir, crate_formatted_name)
-        with open(file_path, 'wb') as f:
+        file_path = os.path.join(settings.dj_library_drive, settings.serato_subcrate_dir, crate_formatted_name)
+        Path(os.path.dirname(file_path)).mkdir(parents=True, exist_ok=True)
+        with open(file_path, 'wb+') as f:
             encoded_data = parse_serato_crates.encode_struct(self.get_crate_data())
             f.write(encoded_data)
