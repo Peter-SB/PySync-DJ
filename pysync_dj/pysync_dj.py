@@ -68,7 +68,7 @@ class PySyncDJ:
         self.logger.info("Saving crate data...")
 
         SeratoCrate(playlist_name, downloaded_track_list)
-        RekordboxLibrary(playlist_name, downloaded_track_list)
+        RekordboxLibrary(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
 
     def download_all_playlists(self) -> None:
         """
@@ -84,7 +84,7 @@ class PySyncDJ:
 
             self.logger.info("Saving crate data...")
             SeratoCrate(playlist_name, downloaded_track_list)
-            RekordboxLibrary(playlist_name, downloaded_track_list)
+            RekordboxLibrary(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
 
     def download_playlist(self, playlist_data: list[dict]) -> list[str]:
         """
