@@ -3,8 +3,6 @@
 
 ## 2.0 Release - Multiprocessing
 
----
-
 ## Features:
 - Multiprocessing
 - Some Reorganisation of the id_to_video_map
@@ -31,7 +29,6 @@ There was some reorganisation of the id_to_video_map to firstly save it to the d
 
 ## Release 1.1 - Save As MP3 
 
----
 
 This update introduces MP4 to MP3 conversion after the audio files are downloaded. This is because CDJs can read MP4 files. The files are converted with python library moviepy. 
 The settings file was also updated (and the spotify client secret refreshed) for security and readability. 
