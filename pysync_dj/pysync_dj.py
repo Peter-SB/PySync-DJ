@@ -1,18 +1,14 @@
 import concurrent.futures
-import os.path
 import traceback
-from typing import Optional
 import logging
-
-import queue
 import multiprocessing
 
 from track_processor import process_track
 from serato_crate import SeratoCrate
 from settings import SettingsSingleton
 from rekordbox_library import RekordboxLibrary
-from utils import init_logging, LOGGER_NAME, set_track_metadata, load_hashmap_from_json, \
-    extract_spotify_playlist_id, sanitize_filename
+from utils import init_logging, LOGGER_NAME, load_hashmap_from_json, \
+    extract_spotify_playlist_id
 from spotify_helper import SpotifyHelper
 from yt_download_helper import YouTubeDownloadHelper
 
@@ -36,8 +32,6 @@ class PySyncDJ:
 
         self.spotify_helper = SpotifyHelper()
         self.ytd_helper = YouTubeDownloadHelper(self.settings.dj_library_drive, self.settings.tracks_folder)
-
-        #self.logger.info(f"Loading local track database")
 
     def run(self):
         """
@@ -108,6 +102,7 @@ class PySyncDJ:
                 self.settings,
                 id_to_video_map,
                 self.logger) for track_data in playlist_data]
+
             for track_processor in concurrent.futures.as_completed(track_processors):
                 try:
                     track_file_path = track_processor.result()
