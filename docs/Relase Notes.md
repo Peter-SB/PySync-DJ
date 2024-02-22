@@ -15,9 +15,9 @@ I want to implement Multiprocessing to speed up the program allowing for multipl
 
 I started by thinking about a fan out producer consumer model. However because the querying of spotify is so quick I decided to not have this as a separate process.
 
-I further diverted from a producer consumer model but not having a live queue, instead each of the processes are created with a specific track to process and are run and managed by a ProcessPoolExecutor from the concurrent.futures library. 
+I further diverted from a producer consumer model but not having a live queue, instead each of the processes are created with a specific track to process and are run and managed by a ProcessPoolExecutor from the concurrent futures library. 
 
-The results of implementing this were impressive and exciting, reducing the processing time of a playlist by over a half!
+The results of implementing this were impressive and exciting, reducing the processing time of a playlist by *over a half*!
 
 Considerations had to be made about asynchronous behaviour using the id_to_video_map in a thread safe way. I decided it would be best to have each of the processes have access to a shared multiprocessing.Manager dictionary to stop duplication of tracks and allow the uptodate id_to_video_map to be saved by the process in case the program was stopped midway. Here a lock was used to write to the saved dictionary file safely.
 

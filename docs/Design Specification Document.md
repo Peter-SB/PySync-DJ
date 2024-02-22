@@ -49,7 +49,7 @@ Keeping music libraries organised across platforms and softwares is effort and h
 - Utilised Test-Driven Development (TDD) to refine functions, such as extracting Spotify playlists from URLs.
 - Iteratively improved the project, addressing edge cases and optimising performance.
 - Adhere to SOLID principles where practical. 
-- Multiprocessing tracks in a fan-out producer/consumer like model. [Read more here](Relase%20Notes.md).
+- Multiprocessing tracks in a fan-out producer/consumer-like model. [Read more here](Relase%20Notes.md).
 
 
 
