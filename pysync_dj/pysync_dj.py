@@ -103,10 +103,10 @@ class PySyncDJ:
                 id_to_video_map,
                 self.logger) for track_data in playlist_data]
 
-            for track_processor in concurrent.futures.as_completed(track_processors):
+            for index, track_processor in enumerate(concurrent.futures.as_completed(track_processors)):
                 try:
                     track_file_path = track_processor.result()
-                    downloaded_tracks.append(track_file_path)
+                    downloaded_tracks.insert(index ,track_file_path)
 
                 except Exception as e:
                     print(f"E {e}")
