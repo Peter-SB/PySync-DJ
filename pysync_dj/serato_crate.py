@@ -1,10 +1,11 @@
 import os
+from pathlib import Path
 from typing import Tuple, List
 import parse_serato_crates as parse_serato_crates
 from settings import SettingsSingleton
 
 class SeratoCrate:
-    def __init__(self, crate_name: str, version: str = '1.0/Serato ScratchLive Crate') -> None:
+    def __init__(self, crate_name: str, downloaded_track_list, version: str = '1.0/Serato ScratchLive Crate') -> None:
         """
         Initialize a Serato Crate.
 
@@ -16,6 +17,9 @@ class SeratoCrate:
         self.tracks = []  # List to store track file paths
         self.extra_crate_data = []
 
+        self.add_tracks(downloaded_track_list)
+        self.save_crate()
+
     def add_crate_data(self, tag_name: str, data: str) -> None:
         """
         Add extra data to the crate.
@@ -24,6 +28,10 @@ class SeratoCrate:
         :param data: The data to be added.
         """
         self.extra_crate_data.append((tag_name, data))
+
+    def add_tracks(self, downloaded_track_list):
+        for track in downloaded_track_list:
+            self.add_track(track)
 
     def add_track(self, file_path: str) -> None:
         """
@@ -57,7 +65,8 @@ class SeratoCrate:
         settings = SettingsSingleton()
 
         crate_formatted_name = f"PySync DJ%%{self.crate_name}.crate"
-        file_path = os.path.join(settings.dj_library_directory, settings.serato_subcrate_dir, crate_formatted_name)
-        with open(file_path, 'wb') as f:
+        file_path = os.path.join(settings.dj_library_drive, settings.serato_subcrate_dir, crate_formatted_name)
+        Path(os.path.dirname(file_path)).mkdir(parents=True, exist_ok=True)
+        with open(file_path, 'wb+') as f:
             encoded_data = parse_serato_crates.encode_struct(self.get_crate_data())
             f.write(encoded_data)

@@ -1,10 +1,6 @@
-import json
 import logging
-from datetime import date, datetime
-
 import yaml
 from typing import Any, Optional
-
 from utils import LOGGER_NAME
 
 
@@ -17,6 +13,7 @@ class SettingsSingleton:
 
     :ivar _instance: Holds the singleton instance.
     :ivar _settings: Stores the loaded settings.
+    :ivar _logger: Program logger
     """
 
     _instance = None
@@ -67,14 +64,13 @@ class SettingsSingleton:
     def spotify_client_secret(self) -> str:
         return self.get_setting('spotify_client_secret')
 
-
     @property
     def spotify_redirect_uri(self) -> str:
         return self.get_setting('spotify_redirect_uri')
 
     @property
-    def dj_library_directory(self) -> str:
-        return self.get_setting('dj_library_directory')
+    def dj_library_drive(self) -> str:
+        return self.get_setting('dj_library_drive')
 
     @property
     def tracks_folder(self) -> str:

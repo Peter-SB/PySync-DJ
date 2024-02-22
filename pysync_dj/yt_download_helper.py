@@ -69,7 +69,6 @@ class YouTubeDownloadHelper:
         # Filter out non-ASCII characters
         return ''.join(c for c in normalized if unicodedata.category(c) != 'Mn' and ord(c) < 128)
 
-
     def search_video(self, search_query: str) -> Optional[YouTube]:
         """
         Search YouTube with the given query and return the first video result.
@@ -132,6 +131,9 @@ class YouTubeDownloadHelper:
         :return: The path of the created MP3 file.
         """
         mp3_file = os.path.splitext(mp4_file)[0] + '.mp3'
+
+        if os.path.isfile(mp3_file):
+            return mp3_file
 
         video_clip = AudioFileClip(mp4_file)
         video_clip.write_audiofile(mp3_file)

@@ -122,26 +122,28 @@ def set_track_metadata(track: dict, track_file_path: str) -> None:
     audio.save()
 
 
-def save_hashmap_to_json(id_to_video_map: dict, file_path: str = "../id_to_video_map.json") -> None:
+def save_hashmap_to_json(id_to_video_map: dict, file_drive, file_path: str = "id_to_video_map.json") -> None:
     """
     Save a hashmap to a JSON file.
 
+    :param file_drive: The Drive to save the hashmap to.
     :param id_to_video_map: The hashmap to save.
     :param file_path: The path to the JSON file where the hashmap will be saved.
     """
-    with open(file_path, 'w') as file:
+    with open(os.path.join(file_drive, file_path), 'w') as file:
         json.dump(id_to_video_map, file, indent=4)
 
 
-def load_hashmap_from_json(file_path: str = "../id_to_video_map.json") -> dict:
+def load_hashmap_from_json(file_drive, file_path: str = "id_to_video_map.json") -> dict:
     """
     Load a hashmap from a JSON file.
 
+    :param file_drive: The drive to load the hash map from.
     :param file_path: The path to the JSON file from which to load the hashmap.
     :return: The loaded hashmap.
     """
     try:
-        with open(file_path, 'r') as file:
+        with open(os.path.join(file_drive, file_path), 'r') as file:
             return json.load(file)
     except FileNotFoundError:
         return {}  # Return an empty dictionary if the file does not exist

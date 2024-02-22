@@ -44,21 +44,22 @@ Keeping music libraries organised across platforms and softwares is effort and h
 
 
 
-## TDD, Iterative Development, and SOLID Principles 
+## TDD, Iterative Development, and Software Practices 
 
 - Utilised Test-Driven Development (TDD) to refine functions, such as extracting Spotify playlists from URLs.
 - Iteratively improved the project, addressing edge cases and optimising performance.
 - Adhere to SOLID principles where practical. 
+- Multiprocessing tracks in a fan-out producer/consumer-like model. [Read more here](Relase%20Notes.md).
 
 
 
 ## GPT Assisted Workflow
 
-GPT-4 was used as a tool for much of this to improve workflows. Speeding up planning, research, and development. While the idea for this has been brewing for a while I finally started by sitting down planning out the project, design phases, what libraries to use, what challenges I might face and how this would work. Then GPT-4 took those notes and rewrote them in a more structured and refined way. 
+GPT-4 was used as a tool for some of this to improve workflows. Speeding up planning, research, and development. While the idea for this has been brewing for a while I finally started by sitting down planning out the project, design phases, what libraries to use, what challenges I might face and how this would work in a notes app. Then GPT-4 took those notes and rewrote them in a more structured and refined way. 
 
-GPT-4 Would also be used for code development to speed up tedious simple class and function writing. Just one less step than going to google and googling how to open a yaml file only to instantly forget after finding the answer on stack overflow.
+GPT-4 Would also be used for code development to speed up tedious simple class and function writing. Just one less step than, for example, going to google and googling how to open a yaml file only to instantly forget after finding the answer on stack overflow.
 
-I experimented with GPT TDD where I would tell it to create my function and unit tests associated with it. I would then edit the unit tests to include overlooked edge cases (the code was good but still simple so needed a lot of help). I would then feed the new test cases back to GPT and tell it to rewrite the function. This was only minorly experimented with though, more investigation needed. I worry about overfitting. One needs to be careful and have an understanding of edge cases or GPT could hypothetically just force the function to work for your unit tests instead of providing a clean solution. 
+I experimented with GPT TDD where I would tell it to create my function and unit tests associated with it. I would then edit the unit tests to include overlooked edge cases (the code was good but still simple so needed a lot of help). I would then feed the new test cases back to GPT and tell it to rewrite the function. This was only minorly experimented with though, more investigation needed. I do worry about overfitting. You'd need to be careful and have an understanding of edge cases or GPT could hypothetically just force the function to work for your unit tests instead of providing a clean solution. 
 
 At no time did I feel that ChatGPT was giving me answers I couldn't have come up with myself, and without an understanding of the answers it gave I would have not been able to correct coding mistakes, fix bugs, and design overarching structures. GPT did however save me time and energy to be better spent elsewhere. Like auto complete or a calculator it is a tool to save you time on the less important parts and save you to think about the bigger picture.
 
@@ -89,7 +90,7 @@ At no time did I feel that ChatGPT was giving me answers I couldn't have come up
 ### Configuration
 - **Settings Management**: A `settings.yaml` file holds configuration settings. 
 
-**Deadline**: 1.0 release __/01/2024.
+**Deadline**: 1.0 release 01/2024.
 
 
 

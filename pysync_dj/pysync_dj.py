@@ -1,12 +1,14 @@
-import os.path
-from typing import Optional
+import concurrent.futures
+import traceback
 import logging
+import multiprocessing
 
-from crate import SeratoCrate
+from track_processor import process_track
+from serato_crate import SeratoCrate
 from settings import SettingsSingleton
 from rekordbox_library import RekordboxLibrary
-from utils import init_logging, LOGGER_NAME, set_track_metadata, load_hashmap_from_json, save_hashmap_to_json, \
-    extract_spotify_playlist_id, sanitize_filename
+from utils import init_logging, LOGGER_NAME, load_hashmap_from_json, \
+    extract_spotify_playlist_id
 from spotify_helper import SpotifyHelper
 from yt_download_helper import YouTubeDownloadHelper
 
@@ -29,10 +31,7 @@ class PySyncDJ:
         self.settings = SettingsSingleton()
 
         self.spotify_helper = SpotifyHelper()
-        self.ytd_helper = YouTubeDownloadHelper(self.settings.dj_library_directory, self.settings.tracks_folder)
-
-        self.logger.info(f"Loading local track database")
-        self.id_to_video_map = load_hashmap_from_json()
+        self.ytd_helper = YouTubeDownloadHelper(self.settings.dj_library_drive, self.settings.tracks_folder)
 
     def run(self):
         """
@@ -55,16 +54,15 @@ class PySyncDJ:
         playlist.
         """
         self.logger.info(f"Getting liked songs information")
-
-        serato_crate = SeratoCrate("Liked Songs")
-        rekordbox_playlist = RekordboxLibrary()
+        playlist_name = "Liked Songs"
 
         liked_songs_data = self.spotify_helper.get_liked_tracks()
-        self.download_playlist(liked_songs_data, serato_crate, rekordbox_playlist)
+        downloaded_track_list = self.download_playlist(liked_songs_data)
 
         self.logger.info("Saving crate data...")
-        serato_crate.save_crate()
-        rekordbox_playlist.create_m3u_file("Liked Songs.m3u")
+
+        SeratoCrate(playlist_name, downloaded_track_list)
+        RekordboxLibrary(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
 
     def download_all_playlists(self) -> None:
         """
@@ -75,88 +73,46 @@ class PySyncDJ:
             playlist_id = extract_spotify_playlist_id(playlist_url)
             self.logger.info(f"Getting playlist information for playlist {playlist_name=}, {playlist_url=}, {playlist_id=}")
 
-            serato_crate = SeratoCrate(playlist_name)
-            rekordbox_playlist = RekordboxLibrary()
-
             playlist_data = self.spotify_helper.get_playlist_tracks(playlist_id)
-            self.download_playlist(playlist_data, serato_crate, rekordbox_playlist)
+            downloaded_track_list = self.download_playlist(playlist_data)
 
             self.logger.info("Saving crate data...")
-            serato_crate.save_crate()
-            rekordbox_playlist.create_m3u_file(f"{playlist_name}.m3u")
+            SeratoCrate(playlist_name, downloaded_track_list)
+            RekordboxLibrary(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
 
-    def download_playlist(self,
-                          playlist_data: list[dict],
-                          serato_crate: SeratoCrate,
-                          rekordbox_playlist: RekordboxLibrary) -> None:
+    def download_playlist(self, playlist_data: list[dict]) -> list[str]:
         """
         Downloads tracks from a given playlist and updates the Serato crate and Rekordbox playlist objects.
 
         :param playlist_data: List of dictionaries containing playlist track data.
-        :param serato_crate: The Serato crate to update with downloaded tracks.
-        :param rekordbox_playlist: The Rekordbox playlist to update with downloaded tracks.
+        :return: List of downloaded tack's file paths.
         """
 
-        for track in playlist_data:
-            try:
-                track_file_path = self.process_spotify_track(track)
+        manager = multiprocessing.Manager()
+        id_to_video_map = manager.dict(load_hashmap_from_json(self.settings.dj_library_drive))
+        lock = manager.Lock()
 
-                rekordbox_playlist.tracks.append(track_file_path)
-                serato_crate.add_track(track_file_path)
+        downloaded_tracks = []
 
-            except Exception as e:
-                self.logger.warning(f"Error, {e}")
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            track_processors = [executor.submit(
+                process_track,
+                track_data,
+                lock,
+                self.settings,
+                id_to_video_map,
+                self.logger) for track_data in playlist_data]
 
-    def process_spotify_track(self, track: dir) -> str:
-        """
-        Checks if a spotify track has already been downloaded, if it has a custom URL, or if it needs to be downloaded.
+            for index, track_processor in enumerate(concurrent.futures.as_completed(track_processors)):
+                try:
+                    track_file_path = track_processor.result()
+                    downloaded_tracks.insert(index ,track_file_path)
 
-        :param track: A dictionary representing the Spotify track.
-        :return: The file path of the downloaded track, or the existing file path if already downloaded.
-        """
-        track_id = track["track"]["id"]
-        track_file_path = self.id_to_video_map.get(track_id)
+                except Exception as e:
+                    print(f"E {e}")
+                    print(traceback.format_exc())
 
-        if track_file_path:
-            # If the file paths is not a custom url and the file is downloaded, skip
-            track_file_path_is_url = "youtube.com/" in track_file_path
-            if not track_file_path_is_url and os.path.exists(track_file_path):
-                self.logger.info(f"Skipping track\"{track['track']['name']}\" as it is already downloaded")
-                return track_file_path
-
-            # If the file path is a custom url, download the track from the given url
-            if track_file_path_is_url:
-                self.logger.info(f"Downloading track: \"{track['track']['name']}\" from custom url {track_file_path}")
-                return self.download_track(track, track_file_path)
-
-        # If there is no file path in the database, or fails other checks, download the track
-        self.logger.info(f"Downloading track: \"{track['track']['name']}\"")
-        return self.download_track(track)
-
-    def download_track(self, track: dir, custom_yt_url: str = None) -> str:
-        """
-        Takes a spotify track and downloads it from YouTube.
-
-        :param track: Spotify track to download
-        :param custom_yt_url: A url for a video to be used instead of a YouTube search if provided
-        :return: The file location of the downloaded track
-        """
-        track_name = track["track"]["name"]
-        track_artist = sanitize_filename(track["track"]["artists"][0]["name"])
-        track_id = track["track"]["id"]
-
-        if custom_yt_url:
-            youtube_video = self.ytd_helper.search_video_url(custom_yt_url)
-        else:
-            youtube_video = self.ytd_helper.search_video(f"{track_artist} - {track_name}")
-
-        track_file_path = self.ytd_helper.download_audio(youtube_video)
-        set_track_metadata(track, track_file_path)
-
-        self.id_to_video_map[track_id] = track_file_path
-        save_hashmap_to_json(self.id_to_video_map)
-
-        return track_file_path
+        return downloaded_tracks
 
 
 # Default usage
