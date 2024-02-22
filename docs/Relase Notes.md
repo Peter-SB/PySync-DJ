@@ -1,6 +1,5 @@
 # Release Notes
 
-
 ## 2.0 Release - Multiprocessing
 
 ### Features:
