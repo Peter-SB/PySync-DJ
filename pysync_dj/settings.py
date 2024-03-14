@@ -56,6 +56,19 @@ class SettingsSingleton:
         """
         return SettingsSingleton._settings.get(key)
 
+    def update_setting(self, key: str, value: Any) -> None:
+        """
+        Update a specific setting value by key in the current session.
+
+        :param key: The key of the setting to update.
+        :param value: The new value for the setting.
+        """
+        if SettingsSingleton._settings is not None:
+            SettingsSingleton._settings[key] = value
+            self._logger.info(f"Updated setting {key} to {value}")
+        else:
+            self._logger.error("Attempted to update setting on uninitialized settings.")
+
     @property
     def spotify_client_id(self) -> str:
         return self.get_setting('spotify_client_id')

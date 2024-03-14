@@ -27,7 +27,9 @@ def init_logging(file_name: str = "logs/pysync_dj.log") -> None:
     logger.setLevel(logging.DEBUG)  # Set the logging level
 
     # Create a file handler that logs messages
-    fh = logging.FileHandler(os.path.join(Path.cwd().parent, file_name))
+    file_path = os.path.join(Path.cwd().parent, file_name)
+    Path(os.path.dirname(file_path)).mkdir(parents=True, exist_ok=True)
+    fh = logging.FileHandler(file_path)
     fh.setLevel(logging.DEBUG)  # Set the logging level for the file handler
 
     # Create a console handler
