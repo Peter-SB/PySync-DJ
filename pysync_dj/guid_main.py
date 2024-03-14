@@ -52,13 +52,13 @@ def get_drives(settings_path: Optional[str] = "../settings.yaml") -> list[str]:
 def run_main_py():
     # This is a placeholder function that you would replace with the actual code to run main.py
     # For example, you could use subprocess to run the script:
-    ui_output_log.log("Downloading...")
+    ui_output_log.log("Starting...")
 
     selected_drive = drive_selector.get()
-    pysync_dj = PySyncDJ(selected_drive, ui_output_log)
+    pysync_dj = PySyncDJ(selected_drive)
     pysync_dj.run()
 
-    ui_output_log.log("Task completed.")
+    ui_output_log.log("Download completed.")
 
 
 # Function to open the settings file
@@ -116,12 +116,9 @@ progress_label.pack(side='left', padx=(0, 10))
 
 progress_bar = ctk.CTkProgressBar(progress_frame)
 progress_bar.pack(fill='x', padx=20, pady=(10, 20))
-progress_bar.set(0.5)  # Example progress
+progress_bar.set(0)  # Example progress
 
 ui_output_log = UIOutputLog(app)
-ui_output_log.log("Starting UX...")
-ui_output_log.error("test")
-ui_output_log.alert("test2")
 ui_output_log.log("Starting UX...")
 
 app.mainloop()

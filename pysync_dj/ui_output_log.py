@@ -1,13 +1,16 @@
 import customtkinter as ctk
 from tkinter import scrolledtext
 
-class UIOutputLog:
-    _instance = None  # Class attribute to store the singleton instance
 
-    def __init__(self, app):
-        """Private constructor. Use the `get_instance()` class method instead."""
-        self.app = app
-        self.log_output_box = self.create_output_log_box(app)
+class UIOutputLog:
+    _instance = None
+
+    def __new__(cls, app=None):
+        if not cls._instance:
+            cls._instance = super(UIOutputLog, cls).__new__(cls)
+            cls._instance.app = app
+            cls._instance.log_output_box = cls._instance.create_output_log_box(app)
+        return cls._instance
 
     @staticmethod
     def create_output_log_box(app) -> scrolledtext.ScrolledText:
@@ -17,19 +20,10 @@ class UIOutputLog:
         log_output_box = scrolledtext.ScrolledText(log_frame, height=10, state='disabled')
         log_output_box.pack(fill='both', expand=True)
 
-        log_output_box.config(state='normal')
+        log_output_box.config(state='normal')  # Temporarily make it writable to update text
         log_output_box.config(state='disabled')  # Make it read-only again
 
         return log_output_box
-
-    @classmethod
-    def get_instance(cls, app=None):
-        """Get the singleton instance of UIOutputLog. If it doesn't exist, create it."""
-        if cls._instance is None:
-            if app is None:
-                raise ValueError("An 'app' instance must be provided to create UIOutputLog.")
-            cls._instance = cls(app)
-        return cls._instance
 
     def log_message(self, message: str, colour: str) -> None:
         self.log_output_box.config(state='normal')
@@ -41,6 +35,9 @@ class UIOutputLog:
         self.app.update()
 
     def log(self, message: str) -> None:
+        self.log_message(message, 'black')
+
+    def info(self, message: str) -> None:
         self.log_message(message, 'black')
 
     def alert(self, message: str) -> None:

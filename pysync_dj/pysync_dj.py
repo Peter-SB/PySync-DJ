@@ -23,13 +23,12 @@ class PySyncDJ:
     and other functionalities to sync a Spotify library with a DJ library.
     """
 
-    def __init__(self, selected_drive, ui_output_log: UIOutputLog):
+    def __init__(self, selected_drive):
         """
         Initializes the PySyncDJ application.
         """
-        init_logging()
-        self.logger = logging.getLogger(LOGGER_NAME)
-        self.ui_output_log = ui_output_log
+        #init_logging()
+        self.logger = UIOutputLog()
 
         self.settings = SettingsSingleton()
         self.settings.update_setting("dj_library_drive", selected_drive)
@@ -44,7 +43,7 @@ class PySyncDJ:
         This method orchestrates the overall process of syncing the Spotify library
         with the DJ library.
         """
-        self.ui_output_log.log("Starting PySync DJ application.")
+        #self.ui_output_log.log("Starting PySync DJ application.")
         self.logger.info("Starting PySync DJ application.")
 
         if self.settings.download_liked_songs:
