@@ -74,25 +74,22 @@ class PySyncDJ:
         playlists.
         """
         playlist_index = 0
-        number_of_playlists = len(self.settings.playlists_to_download)
         for playlist_name, playlist_url in self.settings.playlists_to_download.items():
             playlist_id = extract_spotify_playlist_id(playlist_url)
 
             self.logger.info(f"Getting playlist information for playlist {playlist_name=}, {playlist_url=}, {playlist_id=}")
-            playlist_index += 1
-            self.progress_bar.set_progress(playlist_index/number_of_playlists)
-
 
             playlist_data = self.spotify_helper.get_playlist_tracks(playlist_id)
-            downloaded_track_list = self.download_playlist(playlist_data)
+            downloaded_track_list = self.download_playlist(playlist_data, playlist_index)
 
-            self.logger.info("DJ library data...")
+            self.logger.info("Saving DJ library data...")
             SeratoCrate(playlist_name, downloaded_track_list)
             RekordboxLibrary(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
 
+            playlist_index += 1
 
 
-    def download_playlist(self, playlist_data: list[dict]) -> list[str]:
+    def download_playlist(self, playlist_data: list[dict], playlist_index: int) -> list[str]:
         """
         Downloads tracks from a given playlist and updates the Serato crate and Rekordbox playlist objects.
 
@@ -116,9 +113,13 @@ class PySyncDJ:
                 self.logger) for track_data in playlist_data]
 
             for index, track_processor in enumerate(concurrent.futures.as_completed(track_processors)):
+
+                number_of_playlists = len(self.settings.playlists_to_download)
+                self.progress_bar.set_progress(((index+1)/ len(playlist_data) + playlist_index) / number_of_playlists)
+
                 try:
                     track_file_path = track_processor.result()
-                    downloaded_tracks.insert(index ,track_file_path)
+                    downloaded_tracks.insert(index, track_file_path)
 
                 except Exception as e:
                     print(f"E {e}")

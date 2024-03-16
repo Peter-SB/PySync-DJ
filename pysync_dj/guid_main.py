@@ -111,6 +111,7 @@ class UI:
     def run_main_py(self):
         # This is a placeholder function that you would replace with the actual code to run main.py
         # For example, you could use subprocess to run the script:
+        ProgressBar().set_progress(0)
         self.ui_output_log.log("Starting...")
 
         selected_drive = self.drive_selector.get()
