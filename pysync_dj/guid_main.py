@@ -17,27 +17,32 @@ class UI:
         # Initialize the customtkinter application
         ctk.set_appearance_mode("dark")  # Set the theme to follow the system theme
         ctk.set_default_color_theme("blue")  # Set a color theme
-        app = ctk.CTk()  # Create the main window
-        app.title("PySync DJ")  # Set the window title
+        self.app = ctk.CTk()  # Create the main window
+        self.app.title("PySync DJ")  # Set the window title
 
+        self.ui_output_log.log("Starting UX...")
+
+        self.app.mainloop()
+
+    def build_ui(self):
         # Title
-        title_label = ctk.CTkLabel(app, text="PySync DJ", font=("Roboto", 70))
+        title_label = ctk.CTkLabel(self.app, text="PySync DJ", font=("Roboto", 70))
         title_label.pack(pady=(10, 5))
 
         # Sub Title
-        title_label = ctk.CTkLabel(app, text="Sync your Spotify playlists with your DJ libraries", font=("Roboto", 20))
+        title_label = ctk.CTkLabel(self.app, text="Sync your Spotify playlists with your DJ libraries", font=("Roboto", 20))
         title_label.pack(pady=(20, 25))
 
         # Settings Menu
         # Tkinter Menu for settings
-        menu_bar = Menu(app)
-        app.config(menu=menu_bar)  # Assign the menu to the customtkinter app window
+        menu_bar = Menu(self.app)
+        self.app.config(menu=menu_bar)  # Assign the menu to the customtkinter app window
         settings_menu = Menu(menu_bar, tearoff=0)
         settings_menu.add_command(label="Settings", command=lambda: print("Opening settings..."))
         menu_bar.add_cascade(label="Menu", menu=settings_menu)
 
         # Frame for drive selection and download button
-        selection_frame = ctk.CTkFrame(app)
+        selection_frame = ctk.CTkFrame(self.app)
         selection_frame.pack(pady=14, fill='x', padx=20)
 
         # Drive Selector
@@ -63,9 +68,7 @@ class UI:
         progress_bar.set(0)  # Example progress
 
         self.ui_output_log = UIOutputLog(app)
-        self.ui_output_log.log("Starting UX...")
 
-        app.mainloop()
 
     # Cross-platform method to list available drives/root paths
     @staticmethod
