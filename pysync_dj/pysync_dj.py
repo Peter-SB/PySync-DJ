@@ -1,14 +1,14 @@
 import concurrent.futures
 import traceback
-import logging
 import multiprocessing
 
-from ui_output_log import UIOutputLog
+from ui_elements.progress_bar import ProgressBar
+from ui_elements.ui_output_log import UIOutputLog
 from track_processor import process_track
 from serato_crate import SeratoCrate
 from settings import SettingsSingleton
 from rekordbox_library import RekordboxLibrary
-from utils import init_logging, LOGGER_NAME, load_hashmap_from_json, \
+from utils import load_hashmap_from_json, \
     extract_spotify_playlist_id
 from spotify_helper import SpotifyHelper
 from yt_download_helper import YouTubeDownloadHelper
@@ -27,7 +27,7 @@ class PySyncDJ:
         """
         Initializes the PySyncDJ application.
         """
-        #init_logging()
+        self.progress_bar = ProgressBar()
         self.logger = UIOutputLog()
 
         self.settings = SettingsSingleton()
@@ -73,16 +73,24 @@ class PySyncDJ:
         Get and download all playlists specified in settings, creating corresponding Serato crates and Rekordbox
         playlists.
         """
+        playlist_index = 0
+        number_of_playlists = len(self.settings.playlists_to_download)
         for playlist_name, playlist_url in self.settings.playlists_to_download.items():
             playlist_id = extract_spotify_playlist_id(playlist_url)
+
             self.logger.info(f"Getting playlist information for playlist {playlist_name=}, {playlist_url=}, {playlist_id=}")
+            playlist_index += 1
+            self.progress_bar.set_progress(playlist_index/number_of_playlists)
+
 
             playlist_data = self.spotify_helper.get_playlist_tracks(playlist_id)
             downloaded_track_list = self.download_playlist(playlist_data)
 
-            self.logger.info("Saving crate data...")
+            self.logger.info("DJ library data...")
             SeratoCrate(playlist_name, downloaded_track_list)
             RekordboxLibrary(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
+
+
 
     def download_playlist(self, playlist_data: list[dict]) -> list[str]:
         """

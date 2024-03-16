@@ -1,25 +1,30 @@
+import subprocess
 from typing import Optional
 
 import customtkinter as ctk
-from tkinter import Menu, scrolledtext  # Import Menu from tkinter
-import subprocess
+from tkinter import Menu  # Import Menu from tkinter
 from pathlib import Path
 import os
 
 import yaml
 
-from pysync_dj import PySyncDJ, SettingsSingleton
-from ui_output_log import UIOutputLog
+from pysync_dj import PySyncDJ
+from ui_elements.progress_bar import ProgressBar
+from ui_elements.ui_output_log import UIOutputLog
 
 
 class UI:
     def __init__(self):
         # Initialize the customtkinter application
+        self.ui_output_log = None
+        self.drive_selector = None
+
         ctk.set_appearance_mode("dark")  # Set the theme to follow the system theme
         ctk.set_default_color_theme("blue")  # Set a color theme
         self.app = ctk.CTk()  # Create the main window
         self.app.title("PySync DJ")  # Set the window title
 
+        self.build_ui()
         self.ui_output_log.log("Starting UX...")
 
         self.app.mainloop()
@@ -51,25 +56,19 @@ class UI:
         download_button = ctk.CTkButton(selection_frame, text="Download", command=self.run_main_py)
         download_button.pack(side='right', expand=True, fill='x')
 
-        # Progress Section
-        progress_frame = ctk.CTkFrame(app)
-        progress_frame.pack(fill='x', padx=20, pady=(10, 0))
-
-        progress_label = ctk.CTkLabel(progress_frame, text="Progress:")
-        progress_label.pack(side='left', padx=(0, 10))
-
-        progress_bar = ctk.CTkProgressBar(progress_frame)
-        progress_bar.pack(fill='x', padx=20, pady=(10, 20))
-        progress_bar.set(0)  # Example progress
+        self.build_progress_bar()
 
         self.ui_output_log = UIOutputLog(self.app)
+
+    def build_progress_bar(self):
+        ProgressBar(self.app)
 
     def build_menu_bar(self):
         # Tkinter Menu for settings
         menu_bar = Menu(self.app)
         self.app.config(menu=menu_bar)  # Assign the menu to the customtkinter app window
         settings_menu = Menu(menu_bar, tearoff=0)
-        settings_menu.add_command(label="Settings", command=lambda: print("Opening settings..."))
+        settings_menu.add_command(label="Settings", command=self.open_settings)
         menu_bar.add_cascade(label="Menu", menu=settings_menu)
 
     # Cross-platform method to list available drives/root paths
@@ -125,7 +124,7 @@ class UI:
     def open_settings():
         # Placeholder for opening a settings file. Adjust the file path as needed.
         # For Windows, you could use:
-        # subprocess.run(["notepad.exe", "settings.yaml"])
+        subprocess.run(["notepad.exe", "../settings.yaml"])
         # For cross-platform compatibility, consider using Python's webbrowser or os module
         print("Opening settings file")
 
