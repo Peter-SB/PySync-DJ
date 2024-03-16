@@ -34,12 +34,7 @@ class UI:
         title_label.pack(pady=(20, 25))
 
         # Settings Menu
-        # Tkinter Menu for settings
-        menu_bar = Menu(self.app)
-        self.app.config(menu=menu_bar)  # Assign the menu to the customtkinter app window
-        settings_menu = Menu(menu_bar, tearoff=0)
-        settings_menu.add_command(label="Settings", command=lambda: print("Opening settings..."))
-        menu_bar.add_cascade(label="Menu", menu=settings_menu)
+        self.build_menu_bar()
 
         # Frame for drive selection and download button
         selection_frame = ctk.CTkFrame(self.app)
@@ -67,8 +62,15 @@ class UI:
         progress_bar.pack(fill='x', padx=20, pady=(10, 20))
         progress_bar.set(0)  # Example progress
 
-        self.ui_output_log = UIOutputLog(app)
+        self.ui_output_log = UIOutputLog(self.app)
 
+    def build_menu_bar(self):
+        # Tkinter Menu for settings
+        menu_bar = Menu(self.app)
+        self.app.config(menu=menu_bar)  # Assign the menu to the customtkinter app window
+        settings_menu = Menu(menu_bar, tearoff=0)
+        settings_menu.add_command(label="Settings", command=lambda: print("Opening settings..."))
+        menu_bar.add_cascade(label="Menu", menu=settings_menu)
 
     # Cross-platform method to list available drives/root paths
     @staticmethod
