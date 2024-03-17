@@ -1,6 +1,8 @@
+import logging
 import os
+import logging
 
-from utils import sanitize_filename, set_track_metadata, save_hashmap_to_json
+from utils import sanitize_filename, set_track_metadata, save_hashmap_to_json, LOGGER_NAME, init_debug_logging
 from yt_download_helper import YouTubeDownloadHelper
 
 
@@ -15,6 +17,8 @@ def process_track(track_data, lock, settings, id_to_video_map, logger) -> str:
     :param logger:
     :return: Downloaded track's file path
     """
+    init_debug_logging()
+    logger = logging.getLogger(LOGGER_NAME)
     track_consumer = TrackProcessor(track_data, lock, settings, id_to_video_map, logger)
     return track_consumer.process_spotify_track(track_data)
 
