@@ -15,7 +15,7 @@ import requests
 LOGGER_NAME = "LOGGER_MAIN"
 
 
-def init_logging(file_name: str = "logs/pysync_dj.log") -> None:
+def init_debug_logging(file_name: str = "logs/pysync_dj.log") -> None:
     """
     Initialize logging for the application. This sets up logging to output to both
     the console and a file.
@@ -29,7 +29,8 @@ def init_logging(file_name: str = "logs/pysync_dj.log") -> None:
     # Create a file handler that logs messages
     file_path = os.path.join(Path.cwd().parent, file_name)
     Path(os.path.dirname(file_path)).mkdir(parents=True, exist_ok=True)
-    fh = logging.FileHandler(file_path)
+
+    fh = logging.FileHandler(file_path, mode="w")
     fh.setLevel(logging.DEBUG)  # Set the logging level for the file handler
 
     # Create a console handler
@@ -44,7 +45,6 @@ def init_logging(file_name: str = "logs/pysync_dj.log") -> None:
     # Add the handlers to the logger
     logger.addHandler(fh)
     logger.addHandler(ch)
-
 
 def set_track_metadata_mp4(track: dir, track_file_path: str) -> None:
     """

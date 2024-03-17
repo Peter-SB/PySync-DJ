@@ -1,15 +1,16 @@
 import concurrent.futures
+import logging
 import traceback
 import multiprocessing
 
 from ui_elements.progress_bar import ProgressBar
 from ui_elements.ui_output_log import UIOutputLog
 from track_processor import process_track
-from serato_crate import SeratoCrate
+from dj_libraries.serato_crate import SeratoCrate
 from settings import SettingsSingleton
-from rekordbox_library import RekordboxLibrary
+from dj_libraries.rekordbox_library import RekordboxLibrary
 from utils import load_hashmap_from_json, \
-    extract_spotify_playlist_id
+    extract_spotify_playlist_id, init_debug_logging, LOGGER_NAME
 from spotify_helper import SpotifyHelper
 from yt_download_helper import YouTubeDownloadHelper
 
@@ -28,7 +29,10 @@ class PySyncDJ:
         Initializes the PySyncDJ application.
         """
         self.progress_bar = ProgressBar()
-        self.logger = UIOutputLog()
+        self.ui_output_logger = UIOutputLog()
+
+        init_debug_logging()
+        self.debug_logger = logging.getLogger(LOGGER_NAME)
 
         self.settings = SettingsSingleton()
         self.settings.update_setting("dj_library_drive", selected_drive)
@@ -43,27 +47,28 @@ class PySyncDJ:
         This method orchestrates the overall process of syncing the Spotify library
         with the DJ library.
         """
-        #self.ui_output_log.log("Starting PySync DJ application.")
-        self.logger.info("Starting PySync DJ application.")
+        # self.ui_output_log.log("Starting PySync DJ application.")
+        # self.ui_output_logger.info("Starting PySync DJ application.")
 
         if self.settings.download_liked_songs:
             self.download_liked_songs()
         self.download_all_playlists()
 
-        self.logger.info("PySync DJ application run completed.")
+        self.progress_bar.set_progress(1)
+        self.ui_output_logger.info("Download completed!")
 
     def download_liked_songs(self) -> None:
         """
         Get and download the user's liked songs from Spotify, creating corresponding a Serato crate and Rekordbox
         playlist.
         """
-        self.logger.info(f"Getting liked songs information")
+        self.ui_output_logger.info(f"Getting liked songs information")
         playlist_name = "Liked Songs"
 
         liked_songs_data = self.spotify_helper.get_liked_tracks()
         downloaded_track_list = self.download_playlist(liked_songs_data)
 
-        self.logger.info("Saving crate data...")
+        self.ui_output_logger.info("Saving crate data...")
 
         SeratoCrate(playlist_name, downloaded_track_list)
         RekordboxLibrary(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
@@ -77,17 +82,17 @@ class PySyncDJ:
         for playlist_name, playlist_url in self.settings.playlists_to_download.items():
             playlist_id = extract_spotify_playlist_id(playlist_url)
 
-            self.logger.info(f"Getting playlist information for playlist {playlist_name=}, {playlist_url=}, {playlist_id=}")
+            self.debug_logger.info(f"Getting playlist information for playlist {playlist_name=}, {playlist_url=}, {playlist_id=}")
+            self.ui_output_logger.info(f"Downloading playlist: {playlist_name}")
 
             playlist_data = self.spotify_helper.get_playlist_tracks(playlist_id)
             downloaded_track_list = self.download_playlist(playlist_data, playlist_index)
 
-            self.logger.info("Saving DJ library data...")
+            self.ui_output_logger.info("Saving DJ library data...")
             SeratoCrate(playlist_name, downloaded_track_list)
             RekordboxLibrary(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
 
             playlist_index += 1
-
 
     def download_playlist(self, playlist_data: list[dict], playlist_index: int) -> list[str]:
         """
@@ -103,6 +108,8 @@ class PySyncDJ:
 
         downloaded_tracks = []
 
+        number_of_playlists = len(self.settings.playlists_to_download)
+
         with concurrent.futures.ProcessPoolExecutor() as executor:
             track_processors = [executor.submit(
                 process_track,
@@ -110,20 +117,18 @@ class PySyncDJ:
                 lock,
                 self.settings,
                 id_to_video_map,
-                self.logger) for track_data in playlist_data]
+                self.debug_logger) for track_data in playlist_data]
 
             for index, track_processor in enumerate(concurrent.futures.as_completed(track_processors)):
-
-                number_of_playlists = len(self.settings.playlists_to_download)
-                self.progress_bar.set_progress(((index+1)/ len(playlist_data) + playlist_index) / number_of_playlists)
+                self.progress_bar.set_progress((index / len(playlist_data) + playlist_index) / number_of_playlists)
 
                 try:
                     track_file_path = track_processor.result()
                     downloaded_tracks.insert(index, track_file_path)
 
                 except Exception as e:
-                    print(f"E {e}")
-                    print(traceback.format_exc())
+                    self.debug_logger.error(f"Error downloading tack: {e}")
+                    self.debug_logger.error(traceback.format_exc())
 
         return downloaded_tracks
 

@@ -4,16 +4,25 @@ import customtkinter as ctk
 class ProgressBar:
     _instance = None
 
-    def __new__(cls, app=None):
+    def __new__(cls, app: ctk.CTk = None):
+        """
+        Progress bar for indicating progress of playlist download's progress.
+
+        :param app: The ui app to add the progress bar elements to.
+        """
         if not cls._instance:
             cls._instance = super().__new__(cls)
             cls._instance.app = app
-            cls.progress_bar = cls.build_ui(app)
+            cls.progress_bar = cls.build_ui_elements(app)
         return cls._instance
 
     @staticmethod
-    def build_ui(app):
-        # Progress Section
+    def build_ui_elements(app: ctk.CTk):
+        """
+        Build the progress bar's ui elements
+
+        :param app: the ui app to add the elements to.
+        """
         progress_frame = ctk.CTkFrame(app)
         progress_frame.pack(fill='x', padx=20, pady=(10, 0))
 
@@ -26,16 +35,17 @@ class ProgressBar:
 
         return progress_bar
 
-    def set_progress(self, value: float):
-        self.progress_bar.set(value)
+    def set_progress(self, progress: float) -> None:
+        """
+        Sets the bar's progress. Changes colour to green when progress complete
 
-        # Change color when progress is 100%
-        if value >= 1:
-            # Assuming there's a method to set color, replace 'set_color' with the actual method
-            # And replace 'desired_color' with the actual color you want
-            self.progress_bar.configure(progress_color="green2")  # Adjust this line as per actual method available
+        :param progress: progress represented by a value 0 to 1.
+        """
+        self.progress_bar.set(progress)
+
+        if progress >= 1:
+            self.progress_bar.configure(progress_color="green2")
         else:
-            # Reset to default color if progress is less than 100%
             self.progress_bar.configure(progress_color="dodger blue")
 
         self.progress_bar.update()
