@@ -14,7 +14,6 @@ class RekordboxLibrary:
         """
         Initialize the RekordboxLibrary class.
         """
-        self.logger = logging.getLogger(LOGGER_NAME)
         self.tracks = downloaded_track_list
         self.file_drive = file_drive
 

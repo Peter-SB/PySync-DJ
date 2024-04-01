@@ -69,6 +69,9 @@ class SettingsSingleton:
         else:
             self._logger.error("Attempted to update setting on uninitialized settings.")
 
+    def get_setting_object(self):
+        return self._settings
+
     @property
     def spotify_client_id(self) -> str:
         return self.get_setting('spotify_client_id')

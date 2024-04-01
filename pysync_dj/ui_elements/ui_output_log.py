@@ -25,9 +25,9 @@ class UIOutputLog:
         :param app: the ui app to add the elements to.
         """
         log_frame = ctk.CTkFrame(app)
-        log_frame.pack(fill='both', expand=True, padx=20, pady=(10, 20))
+        log_frame.pack(fill='both', expand=True, padx=30, pady=(10, 20))
 
-        log_output_box = scrolledtext.ScrolledText(log_frame, height=10, state='disabled')
+        log_output_box = scrolledtext.ScrolledText(log_frame, height=30, state='disabled')
         log_output_box.pack(fill='both', expand=True)
 
         return log_output_box

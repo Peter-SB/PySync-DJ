@@ -1,13 +1,11 @@
-import json
-import logging
-from datetime import date, datetime
+from datetime import datetime
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOAuth
 from typing import List, Dict
 
+from event_queue import EventQueueLogger
 from settings import SettingsSingleton
-from utils import LOGGER_NAME
 
 
 class SpotifyHelper:
@@ -18,11 +16,11 @@ class SpotifyHelper:
     and liked tracks, using the Spotipy library.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, event_logger: EventQueueLogger) -> None:
         """
         Initializes the SpotifyHelper with Spotify API credentials.
         """
-        self.logger = logging.getLogger(LOGGER_NAME)
+        self.logger = event_logger
         self.settings = SettingsSingleton()
         self.client_credentials_manager = SpotifyClientCredentials(
             client_id=self.settings.spotify_client_id,

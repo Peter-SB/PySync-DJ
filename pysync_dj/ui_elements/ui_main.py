@@ -1,3 +1,4 @@
+import multiprocessing
 import subprocess
 from typing import Optional
 
@@ -8,22 +9,34 @@ import os
 
 import yaml
 
-from pysync_dj import PySyncDJ
+from event_queue import EventQueueLogger
+from pysync_dj_download import PySyncDJDownload
 from ui_elements.progress_bar import ProgressBar
 from ui_elements.ui_output_log import UIOutputLog
 
 
 class UI:
-    def __init__(self):
+    def __init__(self, event_queue):
         self.app: Optional[ctk.CTk] = None
         self.ui_output_log: Optional[UIOutputLog] = None
         self.drive_selector: Optional[ctk.CTkComboBox] = None
+        self.progress_bar: Optional[ProgressBar] = None
+
+        self.event_queue = event_queue
+        self.event_logger = EventQueueLogger(self.event_queue)
 
         self.build_ui_app()
         self.build_ui_elements()
-        self.ui_output_log.log("UX Started. Ready to download.")
+        self.event_logger.info("Started. Ready to download.")
 
-        self.app.mainloop()
+    def run_download(self) -> None:
+        self.event_logger.update_progress(0)
+        selected_drive = self.drive_selector.get()
+
+        self.event_logger.debug("UI Download Button Click")
+
+        download_process = multiprocessing.Process(target=PySyncDJDownload, args=(selected_drive, self.event_queue))
+        download_process.start()
 
     def build_ui_app(self) -> None:
         ctk.set_appearance_mode("dark")
@@ -61,7 +74,7 @@ class UI:
         download_button.pack(side='right', expand=True, fill='x')
 
         # Build Progress Bar
-        ProgressBar(self.app)
+        self.progress_bar = ProgressBar(self.app)
 
         # Build UI Logger Output
         self.ui_output_log = UIOutputLog(self.app)
@@ -111,20 +124,8 @@ class UI:
 
         return drives
 
-    def run_download(self) -> None:
-        ProgressBar().set_progress(0)
-        selected_drive = self.drive_selector.get()
-
-        self.ui_output_log.log("Starting Download...")
-
-        pysync_dj = PySyncDJ(selected_drive)
-        pysync_dj.run()
-
     # Function to open the settings file
     @staticmethod
     def open_settings() -> None:
         subprocess.run(["notepad.exe", "../settings.yaml"])
 
-
-if __name__ == "__main__":
-    UI()
