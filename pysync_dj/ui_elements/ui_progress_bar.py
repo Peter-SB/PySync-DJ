@@ -1,7 +1,7 @@
 import customtkinter as ctk
 
 
-class ProgressBar:
+class UIProgressBar:
     _instance = None
 
     def __new__(cls, app: ctk.CTk = None):

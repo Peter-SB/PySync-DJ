@@ -13,7 +13,7 @@ def process_track(track_data, lock, settings, id_to_video_map, event_queue) -> s
     :param lock: Lock used for safely saving id_to_video_map.
     :param settings: Users settings.
     :param id_to_video_map:
-    :param event_queue:
+    :param event_queue: This is the events queue that handles logging
     :return: Downloaded track's file path
     """
     event_logger = EventQueueLogger(event_queue)

@@ -2,11 +2,16 @@ import logging
 import multiprocessing
 from queue import Queue
 from typing import Optional
+import customtkinter as ctk
 
 from utils import LOGGER_NAME
 
 
 class EventQueueHandler:
+    """
+    This handles the events queue allowing custom logging and progress bar update across
+    multiple progresses and sub processes.
+    """
 
     def __init__(self):
         self.manager: multiprocessing.Manager = multiprocessing.Manager()
@@ -23,11 +28,16 @@ class EventQueueHandler:
         self.ui = ui
 
     def process_queue(self):
+        """
+        Run periodically by the UI, this function will check the queue until empty and runs the relevant
+        event function and passes the data.
+        """
         handled_queue_events = {
             "update_progress": self.update_progress,
             "log_debug": self.log_debug,
             "log_info": self.log_info,
-            "log_error": self.log_error
+            "log_error": self.log_error,
+            "enable_download_button": self.enable_download_button
         }
 
         # Process all available messages in the queue
@@ -38,16 +48,20 @@ class EventQueueHandler:
                 if handler:
                     handler(data)
                 else:
-                    print("Unknown message type:", event_type)
+                    self.logger.error(f"Unknown message type:{event_type}")
 
             except Exception:
                 import sys, traceback
+                self.logger.error(f"Queue error")
                 print('Whoops! Problem:', file=sys.stderr)
                 traceback.print_exc(file=sys.stderr)
 
         # Schedule the next check of the event queue
         if self.ui:
             self.ui.app.after(100, self.process_queue)
+
+    def enable_download_button(self, data) -> None:
+        self.ui.download_button.configure(state=ctk.NORMAL)
 
     def update_progress(self, progress: float) -> None:
         self.ui.progress_bar.set_progress(progress)
@@ -68,6 +82,9 @@ class EventQueueHandler:
 
 
 class EventQueueLogger:
+    """
+    Act as a logger class for adding to the events queue
+    """
     def __init__(self, queue):
         self.queue = queue
 
@@ -83,6 +100,11 @@ class EventQueueLogger:
     def update_progress(self, progress: float) -> None:
         self.queue.put(("update_progress", progress))
 
+    def enable_download_button(self) -> None:
+        self.queue.put(("enable_download_button", None))
 
 def update_progress_bar(queue, progress: float) -> None:
+    """
+    Static function for updating the progress bar"
+    """
     queue.put(("update_progress", progress))

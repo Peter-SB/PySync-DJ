@@ -1,6 +1,12 @@
 import logging
 import os
+import urllib
 
+import xml.etree.ElementTree as ET
+
+from mutagen.easyid3 import EasyID3
+
+from dj_libraries.itunes_library import ItunesLibrary
 from settings import SettingsSingleton
 from utils import LOGGER_NAME
 
@@ -16,8 +22,7 @@ class RekordboxLibrary:
         """
         self.tracks = downloaded_track_list
         self.file_drive = file_drive
-
-        self.create_m3u_file(f"{playlist_name}.m3u")
+        self.playlist_name = playlist_name
 
     def create_m3u_file(self, output_file_name: str) -> None:
         """

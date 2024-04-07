@@ -1,5 +1,6 @@
 import multiprocessing
 import subprocess
+from multiprocessing import Queue
 from typing import Optional
 
 import customtkinter as ctk
@@ -11,16 +12,17 @@ import yaml
 
 from event_queue import EventQueueLogger
 from pysync_dj_download import PySyncDJDownload
-from ui_elements.progress_bar import ProgressBar
+from ui_elements.ui_progress_bar import UIProgressBar
 from ui_elements.ui_output_log import UIOutputLog
 
 
-class UI:
-    def __init__(self, event_queue):
+class UIMain:
+    def __init__(self, event_queue: Queue):
+        self.download_button: Optional[ctk.CTkButton] = None
         self.app: Optional[ctk.CTk] = None
         self.ui_output_log: Optional[UIOutputLog] = None
         self.drive_selector: Optional[ctk.CTkComboBox] = None
-        self.progress_bar: Optional[ProgressBar] = None
+        self.progress_bar: Optional[UIProgressBar] = None
 
         self.event_queue = event_queue
         self.event_logger = EventQueueLogger(self.event_queue)
@@ -34,6 +36,7 @@ class UI:
         selected_drive = self.drive_selector.get()
 
         self.event_logger.debug("UI Download Button Click")
+        self.download_button.configure(state=ctk.DISABLED)
 
         download_process = multiprocessing.Process(target=PySyncDJDownload, args=(selected_drive, self.event_queue))
         download_process.start()
@@ -70,11 +73,11 @@ class UI:
         self.drive_selector.pack(side='left', padx=(5, 20))
 
         # Build Download Button
-        download_button = ctk.CTkButton(selection_frame, text="Download", command=self.run_download)
-        download_button.pack(side='right', expand=True, fill='x')
+        self.download_button = ctk.CTkButton(selection_frame, text="Download", command=self.run_download)
+        self.download_button.pack(side='right', expand=True, fill='x')
 
         # Build Progress Bar
-        self.progress_bar = ProgressBar(self.app)
+        self.progress_bar = UIProgressBar(self.app)
 
         # Build UI Logger Output
         self.ui_output_log = UIOutputLog(self.app)
@@ -124,8 +127,10 @@ class UI:
 
         return drives
 
-    # Function to open the settings file
     @staticmethod
     def open_settings() -> None:
+        """
+        Opens the setting in notepad for windows users
+        """
         subprocess.run(["notepad.exe", "../settings.yaml"])
 
