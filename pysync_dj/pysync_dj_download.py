@@ -29,14 +29,14 @@ class PySyncDJDownload:
         self.event_logger.info("===============   Starting  Download  ================")
         self.event_logger.info("=======================================================")
 
-        self.settings = SettingsSingleton()
+        self.settings = SettingsSingleton(self.event_logger)
         self.settings.update_setting("dj_library_drive", selected_drive)
         self.total_playlists = (int(self.settings.download_liked_songs) +
                                 (len(self.settings.playlists_to_download) if self.settings.playlists_to_download else 0))
 
         self.spotify_helper = SpotifyHelper(self.event_logger)
         self.ytd_helper = YouTubeDownloadHelper(self.settings.dj_library_drive, self.settings.tracks_folder)
-        self.itunes_library = ItunesLibrary()
+        self.itunes_library = ItunesLibrary(self.event_logger)
 
         self.run()
 
@@ -69,11 +69,7 @@ class PySyncDJDownload:
         liked_songs_data = self.spotify_helper.get_liked_tracks()
         downloaded_track_list = self.download_playlist(liked_songs_data, 0) or []
 
-        self.event_logger.info("Saving DJ library data...")
-
-        #SeratoCrate(playlist_name, downloaded_track_list)
-        #RekordboxLibrary(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
-        self.itunes_library.add_playlist(playlist_name, downloaded_track_list)
+        self.save_to_dj_libraries(playlist_name, downloaded_track_list)
 
     def download_all_playlists(self) -> None:
         """
@@ -91,13 +87,15 @@ class PySyncDJDownload:
             playlist_data = self.spotify_helper.get_playlist_tracks(playlist_id)
             downloaded_track_list = self.download_playlist(playlist_data, playlist_index)
 
-            self.event_logger.info("Saving DJ library data...")
-
-            #SeratoCrate(playlist_name, downloaded_track_list)
-            #RekordboxLibrary(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
-            self.itunes_library.add_playlist(playlist_name, downloaded_track_list)
+            self.save_to_dj_libraries(playlist_name, downloaded_track_list)
 
             playlist_index += 1
+
+    def save_to_dj_libraries(self, playlist_name, downloaded_track_list):
+        self.event_logger.info("Saving DJ library data...")
+        SeratoCrate(playlist_name, downloaded_track_list)
+        RekordboxLibrary(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
+        self.itunes_library.add_playlist(playlist_name, downloaded_track_list)
 
     def download_playlist(self, playlist_data: list[dict], playlist_index: int) -> list[str]:
         """

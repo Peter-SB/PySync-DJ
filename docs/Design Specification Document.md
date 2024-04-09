@@ -1,12 +1,10 @@
-# PySync DJ: Design Specification Document
+# PySync DJ: 1.0 Design Specification Document
 
 
 
 ## Introduction
 
 Keeping music libraries organised across platforms and softwares is effort and hinders users ability to get started on mixing. PySync DJ is a Python-based program designed to stream line this process by synchronize Spotify playlists with DJ libraries, specifically Serato and Rekordbox. This document outlines the planning, design features, implementation phases, and the resolution of challenges encountered during the development of PySync DJ. It serves as a comprehensive guide demonstrating the project's lifecycle from conception to the final 1.0 product.
-
-
 
 
 ## Project Overview
@@ -39,6 +37,7 @@ Keeping music libraries organised across platforms and softwares is effort and h
 
 ### Future Plans
 
+ - Ui and bundled executable
  - Server Setup: Establish a server for managing libraries continuously.
  - Song Selection and Display: Create an algorithm for song selection from youtube and implement a user-friendly display.
 

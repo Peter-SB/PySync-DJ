@@ -11,8 +11,12 @@ from settings import SettingsSingleton
 
 
 class ItunesLibrary:
+    """
+    This class will build a iTune Music Library.xml to be used by RekordBox. The xml file mimics an iTunes library
+    so that users can import there whole PySync DJ library using the import iTunes library feature in RekordBox.
+    """
 
-    def __init__(self) -> None:
+    def __init__(self, event_logger) -> None:
         """
         Initialize the ItunesLibrary class.
         """
@@ -23,14 +27,17 @@ class ItunesLibrary:
         self.all_tracks_dict: Optional[ET.SubElement] = None
         self.plist: Optional[ET.SubElement] = None
 
+        self.event_logger = event_logger
         self.settings = SettingsSingleton()
         self.create_empty_library_xml()
 
     def gen_track_id(self):
+        """ Generate a unique track id"""
         self.unique_track_id_counter += 1
         return self.unique_track_id_counter
 
     def gen_playlist_id(self):
+        """ Generate a unique playlist id"""
         self.unique_playlist_id_counter += 1
         return self.unique_playlist_id_counter
 
@@ -43,13 +50,13 @@ class ItunesLibrary:
 
         # Adding "Library Persistent ID" key with an empty string value
         ET.SubElement(main_dict, "key").text = "Library Persistent ID"
-        ET.SubElement(main_dict, "string").text = " "
+        ET.SubElement(main_dict, "string").text = " "  # Needed or Rekordbox won't read the xml library
 
-        # Tracks dictionary (empty for now)
+        # All tracks in library dictionary
         ET.SubElement(main_dict, "key").text = "Tracks"
         self.all_tracks_dict = ET.SubElement(main_dict, "dict")
 
-        # Playlists array with one dict element
+        # Playlists array for adding playlist (or folder) dicts
         ET.SubElement(main_dict, "key").text = "Playlists"
         self.playlists_array = ET.SubElement(main_dict, "array")
 
@@ -61,10 +68,11 @@ class ItunesLibrary:
         reparsed = minidom.parseString(rough_string)
         pretty_xml_str = reparsed.toprettyxml(indent="  ", encoding="UTF-8")
 
+        # Writing the doctype manually since ElementTree won"t do it for us and its needed by RekordBox
         doctype = '<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">'
         final_xml_content = doctype + '\n' + pretty_xml_str.decode('utf-8')
 
-        # Writing the doctype manually since ElementTree won"t do it for us
+        # Save to file
         file_location = os.path.join(self.settings.dj_library_drive,
                                      self.settings.rekordbox_playlist_folder,
                                      file_name)
@@ -97,7 +105,7 @@ class ItunesLibrary:
 
         self.add_playlist_from_elements(playlist_info)
 
-    def add_playlist_from_elements(self, playlist_info):
+    def add_playlist_from_elements(self, playlist_info: dict):
         playlist_dict = ET.SubElement(self.playlists_array, 'dict')
         for key, value in playlist_info.items():
             ET.SubElement(playlist_dict, 'key').text = key
@@ -113,11 +121,11 @@ class ItunesLibrary:
                 child_type = 'string' if isinstance(value, str) else 'integer'
                 ET.SubElement(playlist_dict, child_type).text = str(value)
 
-    def add_to_all_track(self, tracks_dict):
+    def add_to_all_track(self, tracks_dict: list[tuple[int, str]]) -> None:
         """
-        tracks_dict: [(track_id, track_location)]
-
         Adds track information to the tracks Element.
+
+        :param tracks_dict: [(track_id, track_location)]
         """
 
         tracks_dict = self.format_tracks_dic(tracks_dict)
@@ -132,20 +140,9 @@ class ItunesLibrary:
                 child = ET.SubElement(track_dict, 'string' if key != 'Track ID' else 'integer')
                 child.text = str(value)
 
-    def format_tracks_dic(self, downloaded_tracks_dict) -> {}:
+    def format_tracks_dic(self, downloaded_tracks_dict: list[tuple[int, str]]) -> dict[dict]:
         """
-        return tracks: {
-            "472": {
-                "Track ID": 472,
-                "Name": "Constant Reminder",
-                "Artist": "Anile, DRS",
-                "Album": "Constant Reminder",
-                "Kind": "MPEG audio file",
-                "Persistent ID": "Constant%Reminder",
-                "Track Type": "File",
-                "Location": "file://localhost/D:/PySync%20Dj%20Tracks/Anile%20-%20Constant%20Reminder%20ft%20DRS.mp3"
-            }
-        }
+        Formats the track dictionary ready to be saved in the xml tree
         """
         formatted_track_dict = {}
 
@@ -156,7 +153,7 @@ class ItunesLibrary:
                 name = audio['title'][0] if 'title' in audio else 'Unknown'
                 artist = audio['artist'][0] if 'artist' in audio else 'Unknown'
                 album = audio['album'][0] if 'album' in audio else 'Unknown'
-                total_time = int(audio.info.length * 100)
+                total_time = int(audio.info.length * 100)  # todo: add track length to xml library data
 
                 location = f"file://localhost/{urllib.parse.quote(file_location)}"
 
@@ -178,7 +175,10 @@ class ItunesLibrary:
         return formatted_track_dict
 
     def add_root_playlist(self):
-        # Filling in the playlist dict
+        """
+        Add the root "PySync DJ" Folder.
+        """
+
         root_folder_elements = [
             ("Name", "string", "PySync DJ"),
             ("Description", "string", " "),
@@ -187,6 +187,7 @@ class ItunesLibrary:
             ("All Items", "true", None),
             ("Folder", "true", None)
         ]
+
         root_playlist = ET.SubElement(self.playlists_array, "dict")
         for key, tag, text in root_folder_elements:
             ET.SubElement(root_playlist, "key").text = key

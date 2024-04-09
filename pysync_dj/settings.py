@@ -1,7 +1,5 @@
-import logging
 import yaml
 from typing import Any, Optional
-from utils import LOGGER_NAME
 
 
 class SettingsSingleton:
@@ -18,9 +16,11 @@ class SettingsSingleton:
 
     _instance = None
     _settings = None
-    _logger = logging.getLogger(LOGGER_NAME)
+    _logger: 'EventQueueLogger' = None
 
-    def __new__(cls, file_path: Optional[str] = "../settings.yaml") -> 'SettingsSingleton':
+    def __new__(cls,
+                event_logger: 'EventQueueLogger' = None,
+                file_path: Optional[str] = "../settings.yaml") -> 'SettingsSingleton':
         """
         Create a new instance of SettingsSingleton if it doesn't exist, or return the existing instance.
 
@@ -30,6 +30,7 @@ class SettingsSingleton:
         if cls._instance is None:
             cls._instance = super(SettingsSingleton, cls).__new__(cls)
             cls._instance.load_settings(file_path)
+            cls._logger = event_logger
 
         return cls._instance
 
@@ -43,8 +44,6 @@ class SettingsSingleton:
         if file_path is not None and SettingsSingleton._settings is None:
             with open(file_path, 'r') as file:
                 SettingsSingleton._settings = yaml.safe_load(file)
-
-        # SettingsSingleton._logger.warning(f"Loading settings but file path was None. {file_path=}")
 
     @staticmethod
     def get_setting(key: str) -> Any:
@@ -65,7 +64,7 @@ class SettingsSingleton:
         """
         if SettingsSingleton._settings is not None:
             SettingsSingleton._settings[key] = value
-            self._logger.info(f"Updated setting {key} to {value}")
+            self._logger.debug(f"Updated setting {key} to {value}")
         else:
             self._logger.error("Attempted to update setting on uninitialized settings.")
 
