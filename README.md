@@ -8,18 +8,24 @@
 ## Overview
 PySync DJ is a Python-based application designed to sync a Spotify library with a DJ library. It allows users to select Spotify playlists, downloads the tracks as MP3 files (sourced from YouTube), and integrates them with both Serato and Rekordbox DJ libraries. The project aims to streamline the often tedious process of syncing and managing music playlists so we can spend more time DJing!.
 
-**Full Design Document [Here](docs/Design%20Specification%20Document.md)**
+**Full 1.0 Design Document [Here](docs/Design%20Specification%20Document.md)**  
+**Release Notes [Here](docs/Release%20Notes.md)**
+
+<p align="center">
+  <img src='docs/Screenshot UI.png' width='450'>
+</p>
 
 ## Features
 - **Spotify Integration**: Queries Spotify for Liked Songs and playlist information.
 - **YouTube Downloading**: Downloads audio tracks from YouTube based on Spotify playlist data. (Saved in 128kbps).
+- **User Interface**: Simple UI for quick and easy use.
 - **Intelligent File Management**:
   - Avoids duplication of downloaded files, even when on multiple playlists. Reduces need for reanalysing files. 
   - Organizing tracks by Spotify track and artist names. 
   - Stores Spotify track metadata, including album cover.
 - **Serato and Rekordbox Compatibility**: Seamlessly sync playlists with Serato and Rekordbox. Always have your Spotify libary ready to DJ.
+- **Multi-Track Processing**: Download and process multiple tracks at once for faster run times.
 - **Configurable**: Users can manually override YouTube video sources.
-- **Advanced Search Algorithm**: *(Planned)* Improved search algorithms for YouTube videos with confidence levels.
 - **Additional Platform Support**: *(Planned)* Future integration with SoundCloud and custom playlists.
 
 ## Installation
@@ -57,7 +63,7 @@ leave `liked_songs_track_limit` and `rekordbox_playlist_folder` as `null` to not
 Run the program from the command line:
 
 ```bash
-python pysync_dj.py
+python pysync_dj_main.py
 ```
 
 If the program pauses without doing anything for more than a few mins, you can always stop it and try again.

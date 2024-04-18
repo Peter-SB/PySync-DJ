@@ -1,8 +1,9 @@
+import datetime
 import json
 import logging
 import os
 import re
-from pathlib import Path
+from logging.handlers import RotatingFileHandler
 from typing import Optional
 
 import unicodedata
@@ -15,33 +16,47 @@ import requests
 LOGGER_NAME = "LOGGER_MAIN"
 
 
-def init_logging(file_name: str = "logs/pysync_dj.log") -> None:
-    """
-    Initialize logging for the application. This sets up logging to output to both
-    the console and a file.
+def setup_file_logging() -> logging.Logger:
+    def find_log_files(directory):
+        matched_files = []
+        for filename in os.listdir(directory):
+            if filename.startswith("pysync_dj_log_") and filename.endswith(".log"):
+                matched_files.append(os.path.join(directory, filename))
+        return matched_files
 
-    :param file_name: file to log to
-    """
-    # Create a logger
+    log_directory = "../logs"
+    if not os.path.exists(log_directory):
+        os.makedirs(log_directory)
+
+    # Clean up old log files, ensure only the latest 3 are kept.
+    existing_logs = find_log_files(os.path.join(log_directory))
+    existing_logs.sort(reverse=True)
+    for old_log in existing_logs[2:]:
+        os.remove(old_log)
+
+    # Filename with datetime suffix
+    datetime_suffix = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    log_filename = os.path.join(log_directory, f"pysync_dj_log_{datetime_suffix}.log")
+
+    # Set up logging
     logger = logging.getLogger(LOGGER_NAME)
-    logger.setLevel(logging.DEBUG)  # Set the logging level
+    logger.setLevel(logging.DEBUG)  # Adjust as needed
 
-    # Create a file handler that logs messages
-    fh = logging.FileHandler(os.path.join(Path.cwd().parent, file_name))
-    fh.setLevel(logging.DEBUG)  # Set the logging level for the file handler
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)  # Adjust as needed
+    console_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    console_handler.setFormatter(console_formatter)
+    logger.addHandler(console_handler)
 
-    # Create a console handler
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)  # Set the logging level for the console handler
+    # File handler with rotation
+    file_handler = RotatingFileHandler(log_filename, maxBytes=5 * 1024 * 1024, backupCount=2)
+    file_handler.setLevel(logging.DEBUG)  # Adjust as needed
+    file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(file_formatter)
+    logger.addHandler(file_handler)
 
-    # Create formatter and add it to the handlers
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    fh.setFormatter(formatter)
-    ch.setFormatter(formatter)
-
-    # Add the handlers to the logger
-    logger.addHandler(fh)
-    logger.addHandler(ch)
+    return logger
 
 
 def set_track_metadata_mp4(track: dir, track_file_path: str) -> None:
@@ -101,7 +116,8 @@ def set_track_metadata(track: dict, track_file_path: str) -> None:
     audio['TIT2'] = TIT2(encoding=3, text=track_name)
     audio['TPE1'] = TPE1(encoding=3, text=track_artists)
     audio['TALB'] = TALB(encoding=3, text=track_album)
-    audio['COMM'] = COMM(encoding=3, lang='eng', desc=f'Popularity = {track_popularity}', text=f"{track_popularity}")  # todo: Needs fixing after mp3 update
+    audio['COMM'] = COMM(encoding=3, lang='eng', desc=f'Popularity = {track_popularity}',
+                         text=f"{track_popularity}")  # todo: Needs fixing after mp3 update
 
     audio.save()
 

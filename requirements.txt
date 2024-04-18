@@ -2,5 +2,7 @@ setuptools~=68.2.0
 requests~=2.31.0
 mutagen~=1.47.0
 PyYAML~=6.0.1
+customtkinter~=5.2.2
 spotipy~=2.23.0
 pytube~=15.0.0
+moviepy~=1.0.3

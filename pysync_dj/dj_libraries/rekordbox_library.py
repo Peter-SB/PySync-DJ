@@ -1,8 +1,5 @@
-import logging
 import os
-
 from settings import SettingsSingleton
-from utils import LOGGER_NAME
 
 
 class RekordboxLibrary:
@@ -14,11 +11,9 @@ class RekordboxLibrary:
         """
         Initialize the RekordboxLibrary class.
         """
-        self.logger = logging.getLogger(LOGGER_NAME)
         self.tracks = downloaded_track_list
         self.file_drive = file_drive
-
-        self.create_m3u_file(f"{playlist_name}.m3u")
+        self.playlist_name = playlist_name
 
     def create_m3u_file(self, output_file_name: str) -> None:
         """
