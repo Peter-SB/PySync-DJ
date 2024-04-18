@@ -11,6 +11,10 @@ PySync DJ is a Python-based application designed to sync a Spotify library with 
 **Full 1.0 Design Document [Here](docs/Design%20Specification%20Document.md)**  
 **Release Notes [Here](docs/Release%20Notes.md)**
 
+<p align="center">
+  <img src='docs/Screenshot UI.png' width='450'>
+</p>
+
 ## Features
 - **Spotify Integration**: Queries Spotify for Liked Songs and playlist information.
 - **YouTube Downloading**: Downloads audio tracks from YouTube based on Spotify playlist data. (Saved in 128kbps).
