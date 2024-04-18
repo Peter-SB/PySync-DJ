@@ -63,7 +63,7 @@ leave `liked_songs_track_limit` and `rekordbox_playlist_folder` as `null` to not
 Run the program from the command line:
 
 ```bash
-python pysync_dj_download.py
+python pysync_dj_main.py
 ```
 
 If the program pauses without doing anything for more than a few mins, you can always stop it and try again.
