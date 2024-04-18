@@ -1,7 +1,7 @@
 import os
 import urllib
 import xml.etree.ElementTree as ET
-from typing import Optional
+from typing import Optional, Dict, Union, Any
 from xml.dom import minidom
 
 from mutagen.easyid3 import EasyID3
@@ -16,7 +16,7 @@ class ItunesLibrary:
     so that users can import there whole PySync DJ library using the import iTunes library feature in RekordBox.
     """
 
-    def __init__(self, event_logger) -> None:
+    def __init__(self, event_logger: 'EventQueueLogger') -> None:
         """
         Initialize the ItunesLibrary class.
         """
@@ -31,17 +31,17 @@ class ItunesLibrary:
         self.settings = SettingsSingleton()
         self.create_empty_library_xml()
 
-    def gen_track_id(self):
+    def gen_track_id(self) -> int:
         """ Generate a unique track id"""
         self.unique_track_id_counter += 1
         return self.unique_track_id_counter
 
-    def gen_playlist_id(self):
+    def gen_playlist_id(self) -> int:
         """ Generate a unique playlist id"""
         self.unique_playlist_id_counter += 1
         return self.unique_playlist_id_counter
 
-    def create_empty_library_xml(self):
+    def create_empty_library_xml(self) -> None:
         # XML declaration and root element setup
         self.plist = ET.Element("plist", version="1.0")
 
@@ -62,7 +62,7 @@ class ItunesLibrary:
 
         self.add_root_playlist()
 
-    def save_xml(self, file_name="iTunes Music Library.xml"):
+    def save_xml(self, file_name:str = "iTunes Music Library.xml") -> None:
         # Convert to a pretty XML string
         rough_string = ET.tostring(self.plist, "utf-8")
         reparsed = minidom.parseString(rough_string)
@@ -79,12 +79,12 @@ class ItunesLibrary:
         with open(file_location, "w", encoding="UTF-8") as f:
             f.write(final_xml_content)
 
-    def add_playlist(self, playlist_name, file_locations):
+    def add_playlist(self, playlist_name: str, file_locations: list[str]) -> None:
         """
         Adds playlist information to the playlists Element.
 
         :param playlist_name: name of the playlist being saved.
-        :param file_locations: list of locations tuples
+        :param file_locations: list of locations
 
         """
         track_dict = [(self.gen_track_id(), file_location) for file_location in file_locations]
@@ -105,7 +105,7 @@ class ItunesLibrary:
 
         self.add_playlist_from_elements(playlist_info)
 
-    def add_playlist_from_elements(self, playlist_info: dict):
+    def add_playlist_from_elements(self, playlist_info: dict) -> None:
         playlist_dict = ET.SubElement(self.playlists_array, 'dict')
         for key, value in playlist_info.items():
             ET.SubElement(playlist_dict, 'key').text = key
@@ -140,7 +140,8 @@ class ItunesLibrary:
                 child = ET.SubElement(track_dict, 'string' if key != 'Track ID' else 'integer')
                 child.text = str(value)
 
-    def format_tracks_dic(self, downloaded_tracks_dict: list[tuple[int, str]]) -> dict[dict]:
+    def format_tracks_dic(self, downloaded_tracks_dict: list[tuple[int, str]]) -> Optional[
+        dict[int, dict[str, Union[Union[str, int], Any]]]]:
         """
         Formats the track dictionary ready to be saved in the xml tree
         """
@@ -174,7 +175,7 @@ class ItunesLibrary:
 
         return formatted_track_dict
 
-    def add_root_playlist(self):
+    def add_root_playlist(self) -> None:
         """
         Add the root "PySync DJ" Folder.
         """

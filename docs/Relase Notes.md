@@ -1,5 +1,29 @@
 # Release Notes
 
+## 3.0 Release - UI
+
+This update turns the console application into a guid app complete with download button, download drive selector, progress bar, and ui output log. It also adds Itune Music Library.xml export format for even simpler rekordbox integration. 
+
+Custom TKinter was used to build a simple guid app that spawned a sub process to run the main download script. 
+
+This update required a large refactor and the code base has grown to accommodate new ui classes as well as a class for handling the event queue and a new class for handling the itunes export.
+
+### Event Queue
+
+Because of the multiple subprocesses, a managed queue was the solution to allow logging and passing of ui updates across subprocesse’s memory separate spaces. The ui runs a function to check the queue periodically and read whether to log debug/info/error to the logger and ui log output, or to update the progress bar. 
+
+### Clean Code, Comments, and Typing
+
+As the size of the project grows and code is refactored, I'm focusing more on good code then obvious doc string. Typing also has the added benefit of helping the interpreter's intellisense and well named, single purpose function allow functionality to be implicitly understood. I still believe there is still a time and place for comments and docstrings where greater meaning or higher level concepts need explaining.
+
+### iTunes Music Libary.xml
+
+To better integrate with Rekordbox I reverse engineered the library.xml files that iTunes exports that can be read by rekordbox. This allows for quicker and more organised importing of your PySync DJ library. 
+
+While not simple to reverse engineer, many fields saved in the .xml file by itunes were unnecessary, this change has greatly improved user experience in rekordbox.  
+
+
+
 ## 2.0 Release - Multiprocessing
 
 ### Features:

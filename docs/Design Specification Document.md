@@ -84,7 +84,7 @@ At no time did I feel that ChatGPT was giving me answers I couldn't have come up
 
 ### DJ Software Integration
 - **Serato Integration**: Serato crates are saved directly to your Serato file and will be available when Serato is loaded. 
-- **Rekordbox Integration**: Rekordbox playlists are saved as `.m3u` files and are imported. 
+- **Rekordbox Integration**: Rekordbox playlists are exported as a iTunes Library.xml and alternatively saved as `.m3u` files and are imported. 
 
 ### Configuration
 - **Settings Management**: A `settings.yaml` file holds configuration settings. 

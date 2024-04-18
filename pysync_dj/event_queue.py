@@ -24,10 +24,10 @@ class EventQueueHandler:
         if self.manager:
             self.manager.shutdown()
 
-    def set_ui(self, ui: 'UI'):
+    def set_ui(self, ui: 'UI') -> None:
         self.ui = ui
 
-    def process_queue(self):
+    def process_queue(self) -> None:
         """
         Run periodically by the UI, this function will check the queue until empty and runs the relevant
         event function and passes the data.
@@ -85,6 +85,7 @@ class EventQueueLogger:
     """
     Act as a logger class for adding to the events queue
     """
+
     def __init__(self, queue):
         self.queue = queue
 
@@ -103,8 +104,9 @@ class EventQueueLogger:
     def enable_download_button(self) -> None:
         self.queue.put(("enable_download_button", None))
 
+
 def update_progress_bar(queue, progress: float) -> None:
     """
-    Static function for updating the progress bar"
+    Static function for updating the progress bar
     """
     queue.put(("update_progress", progress))
