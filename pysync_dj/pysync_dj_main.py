@@ -1,4 +1,5 @@
 import logging
+import multiprocessing
 from typing import Optional
 
 from event_queue import EventQueueHandler
@@ -26,4 +27,5 @@ class PySyncDJMain:
 
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     PySyncDJMain()
