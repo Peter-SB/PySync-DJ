@@ -62,7 +62,7 @@ class ItunesLibrary:
 
         self.add_root_playlist()
 
-    def save_xml(self, file_name:str = "iTunes Music Library.xml") -> None:
+    def save_xml(self, file_name: str = "iTunes Music Library.xml") -> None:
         # Convert to a pretty XML string
         rough_string = ET.tostring(self.plist, "utf-8")
         reparsed = minidom.parseString(rough_string)
@@ -76,6 +76,7 @@ class ItunesLibrary:
         file_location = os.path.join(self.settings.dj_library_drive,
                                      self.settings.rekordbox_playlist_folder,
                                      file_name)
+        os.makedirs(os.path.dirname(file_location), exist_ok=True)
         with open(file_location, "w", encoding="UTF-8") as f:
             f.write(final_xml_content)
 

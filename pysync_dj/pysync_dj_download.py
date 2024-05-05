@@ -5,7 +5,7 @@ import traceback
 import pytube.exceptions
 
 from dj_libraries.itunes_library import ItunesLibrary
-from event_queue import EventQueueLogger
+from event_queue import EventQueueLogger, EventQueueHandler
 from track_processor import process_track
 from dj_libraries.serato_crate import SeratoCrate
 from settings import SettingsSingleton
@@ -30,9 +30,12 @@ class PySyncDJDownload:
         self.event_logger.info("=======================================================")
 
         self.settings = SettingsSingleton(self.event_logger)
-        self.settings.update_setting("dj_library_drive", selected_drive)
-        self.total_playlists = (int(self.settings.download_liked_songs) +
-                                (len(self.settings.playlists_to_download) if self.settings.playlists_to_download else 0))
+        if selected_drive:
+            self.settings.update_setting("dj_library_drive", selected_drive)
+        self.total_playlists = (
+                int(self.settings.download_liked_songs) +
+                (len(self.settings.playlists_to_download) if self.settings.playlists_to_download else 0)
+        )
 
         self.spotify_helper = SpotifyHelper(self.event_logger)
         self.ytd_helper = YouTubeDownloadHelper(self.settings.dj_library_drive, self.settings.tracks_folder)
@@ -81,7 +84,8 @@ class PySyncDJDownload:
         for playlist_name, playlist_url in self.settings.playlists_to_download.items():
             playlist_id = extract_spotify_playlist_id(playlist_url)
 
-            self.event_logger.debug(f"Getting playlist information for playlist {playlist_name=}, {playlist_url=}, {playlist_id=}")
+            self.event_logger.debug(
+                f"Getting playlist information for playlist {playlist_name=}, {playlist_url=}, {playlist_id=}")
             self.event_logger.info(f"Downloading playlist: {playlist_name}")
 
             playlist_data = self.spotify_helper.get_playlist_tracks(playlist_id)
@@ -120,12 +124,12 @@ class PySyncDJDownload:
                                                     self.settings.get_setting_object(),
                                                     id_to_video_map,
                                                     self.event_queue): track_data
-                for track_data in playlist_data
-            }
+                                    for track_data in playlist_data
+                                    }
 
             for index, future in enumerate(concurrent.futures.as_completed(future_to_track_data)):
                 track_data = future_to_track_data[future]
-                track_artist = track_data.get("track", {}).get("artists",[{}])[0].get("name", "Unknown")
+                track_artist = track_data.get("track", {}).get("artists", [{}])[0].get("name", "Unknown")
                 track_identifier = f"{track_artist} - {track_data.get('track', {}).get('name')}"
 
                 try:
@@ -145,3 +149,7 @@ class PySyncDJDownload:
                 self.event_logger.update_progress((index / len(playlist_data) + playlist_index) / self.total_playlists)
 
         return downloaded_tracks
+
+
+if __name__ == "__main__":
+    PySyncDJDownload(None, EventQueueHandler())
