@@ -3,8 +3,6 @@
 *$py.class
 *.cache
 
-PySyncDJ.spec
-
 .idea/
 id_to_video_map.json
 pysync_dj/__pycache__/
