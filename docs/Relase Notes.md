@@ -1,6 +1,6 @@
 # Release Notes
 
-## 3.1 Release - Windows 
+## 3.1 Release - Windows Executable
 
 Bundles a runnable exe for use by Windows users.
 
