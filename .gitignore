@@ -8,5 +8,6 @@ id_to_video_map.json
 pysync_dj/__pycache__/
 pysync_dj/.cache
 venv/
+build/
 __pycache__/
 settings.yaml

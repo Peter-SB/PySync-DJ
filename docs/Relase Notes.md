@@ -1,5 +1,11 @@
 # Release Notes
 
+## 3.1 Release - Windows Executable
+
+Bundles a runnable exe for use by Windows users.
+
+Bug Fix: Failing to create Itune Library.xml folder.
+
 ## 3.0 Release - UI
 
 This update turns the console application into a guid app complete with download button, download drive selector, progress bar, and ui output log. It also adds Itune Music Library.xml export format for even simpler rekordbox integration. 
