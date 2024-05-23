@@ -152,4 +152,5 @@ class PySyncDJDownload:
 
 
 if __name__ == "__main__":
-    PySyncDJDownload(None, EventQueueHandler())
+    multiprocessing.freeze_support()
+    PySyncDJDownload(None, EventQueueHandler().event_queue)
