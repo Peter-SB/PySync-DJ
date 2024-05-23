@@ -1,5 +1,11 @@
 # Release Notes
 
+## 3.2 Release - Swap Pytube For PytubeFix
+
+Fixed broken Pytube by replacing with newer forked library PytubeFix. 
+
+Also built a new dist & added code to allow running without guid.
+
 ## 3.1 Release - Windows Executable
 
 Bundles a runnable exe for use by Windows users.

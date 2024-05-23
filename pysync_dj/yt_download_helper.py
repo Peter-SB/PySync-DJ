@@ -7,8 +7,8 @@ import pytube.helpers
 import unicodedata
 from moviepy.audio.io.AudioFileClip import AudioFileClip
 from moviepy.video.io.VideoFileClip import VideoFileClip
-from pytube import Search, YouTube
-from pytube.exceptions import VideoUnavailable
+from pytubefix import Search, YouTube
+from pytubefix.exceptions import VideoUnavailable
 
 from utils import LOGGER_NAME
 

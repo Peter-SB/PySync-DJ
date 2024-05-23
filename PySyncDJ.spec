@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['pysync_dj\\pysync_dj_main.py'],
+    ['pysync_dj/pysync_dj_main.py'],
     pathex=[],
     binaries=[],
-    datas=[('.\settings.yaml', '.')],
+    datas=[('./settings.yaml', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
