@@ -8,4 +8,5 @@ pytube~=15.0.0
 moviepy~=1.0.3
 ffmpeg-python~=0.2.0
 future~=1.0.0
-pytubefix~=5.6.3
+pytubefix>=6.5rc1
+pyinstaller~=6.9.0
