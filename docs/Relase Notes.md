@@ -2,7 +2,7 @@
 
 ## 3.3 Release - Update PytubeFix and fix ordering error
 
-Updated the Pytubefix version and fix bug where list were in order of playlist were wrong because of async behaviour.
+Updated the Pytubefix version and fix bug where playlists were not in correct order. Playlist were wrong because of async behaviour.
 
 ## 3.2 Release - Swap Pytube For PytubeFix
 
