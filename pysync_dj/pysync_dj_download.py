@@ -114,7 +114,7 @@ class PySyncDJDownload:
         id_to_video_map = manager.dict(load_hashmap_from_json(self.settings.dj_library_drive))
         lock = manager.Lock()
 
-        downloaded_tracks = []
+        downloaded_tracks: list[None, str] = [None for i in range(len(playlist_data))]
 
         with concurrent.futures.ProcessPoolExecutor(max_workers=3) as executor:
             # Submit tasks to the executor
@@ -124,8 +124,7 @@ class PySyncDJDownload:
                                                     self.settings.get_setting_object(),
                                                     id_to_video_map,
                                                     self.event_queue): track_data
-                                    for track_data in playlist_data
-                                    }
+                                    for track_data in playlist_data}
 
             for index, future in enumerate(concurrent.futures.as_completed(future_to_track_data)):
                 track_data = future_to_track_data[future]
@@ -134,7 +133,7 @@ class PySyncDJDownload:
 
                 try:
                     track_file_path = future.result()
-                    downloaded_tracks.insert(index, track_file_path)
+                    downloaded_tracks[index] = track_file_path
 
                 except pytube.exceptions.AgeRestrictedError as e:
                     self.event_logger.error(f"Age Restricted Video, \"{track_identifier}\" Cant Download.")
@@ -148,7 +147,7 @@ class PySyncDJDownload:
 
                 self.event_logger.update_progress((index / len(playlist_data) + playlist_index) / self.total_playlists)
 
-        return downloaded_tracks
+        return [item for item in downloaded_tracks if item is not None]
 
 
 if __name__ == "__main__":
