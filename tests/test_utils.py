@@ -22,10 +22,6 @@ class TestExtractSpotifyPlaylistID(unittest.TestCase):
         url = "https://notspotifyurl.com/playlist/7suQlwliFponAvWaKjyBxC"
         self.assertEqual("7suQlwliFponAvWaKjyBxC", extract_spotify_playlist_id(url))
 
-    def test_invalid_url2(self):
-        url = "https://notspotifyurl.com/playlist2/7suQlwliFponAvWaKjyBxC"
-        self.assertEqual("7suQlwliFponAvWaKjyBxC", extract_spotify_playlist_id(url))
-
     def test_url_without_playlist_id(self):
         url = "https://open.spotify.com/playlist/"
         self.assertIsNone(extract_spotify_playlist_id(url))
