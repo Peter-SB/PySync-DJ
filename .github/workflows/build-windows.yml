@@ -15,4 +15,4 @@ jobs:
           python_ver: '3.9'
           spec: 'PySyncDj.spec'
           requirements: 'requirements.txt'
-          upload_exe_with_name: 'PySync DJ'
+          upload_exe_with_name: 'PySync DJ Windows'
