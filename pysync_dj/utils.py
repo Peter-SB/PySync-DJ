@@ -152,17 +152,22 @@ def save_hashmap_to_json(id_to_video_map: dict, file_drive, file_path: str = "id
 
 def load_hashmap_from_json(file_drive, file_path: str = "id_to_video_map.json") -> dict:
     """
-    Load a hashmap from a JSON file.
+    Load a hashmap from a JSON file, creating the file with an empty dictionary if it doesn't exist.
 
     :param file_drive: The drive to load the hash map from.
     :param file_path: The path to the JSON file from which to load the hashmap.
     :return: The loaded hashmap.
     """
-    try:
-        with open(os.path.join(file_drive, file_path), 'r') as file:
+    full_path = os.path.join(file_drive, file_path)
+    if not os.path.exists(full_path):
+        # Create the file with an empty dictionary if it doesn't exist
+        with open(full_path, 'w') as file:
+            json.dump({}, file)
+        return {}
+    else:
+        # Load the existing file
+        with open(full_path, 'r') as file:
             return json.load(file)
-    except FileNotFoundError:
-        return {}  # Return an empty dictionary if the file does not exist
 
 
 def extract_spotify_playlist_id(url: str) -> Optional[str]:

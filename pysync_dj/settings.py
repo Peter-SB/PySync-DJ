@@ -1,3 +1,5 @@
+import os
+
 import yaml
 from typing import Any, Optional
 
@@ -42,7 +44,12 @@ class SettingsSingleton:
         :param file_path: The path to the JSON file containing settings.
         """
         if file_path is not None and SettingsSingleton._settings is None:
-            with open(file_path, 'r') as file:
+            # Normalize the file path for OS compatibility
+            safe_file_path = os.path.normpath(file_path)
+
+            if not os.path.exists(safe_file_path):
+                raise FileNotFoundError(f"No settings file found at the specified location: {safe_file_path}")
+            with open(safe_file_path, 'r') as file:
                 SettingsSingleton._settings = yaml.safe_load(file)
 
     @staticmethod

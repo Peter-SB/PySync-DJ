@@ -2,7 +2,7 @@ import os
 from settings import SettingsSingleton
 
 
-class RekordboxLibrary:
+class RekordboxM3UPlaylist:
     """
     Helper class for creating M3U playlist files compatible with Rekordbox.
     """

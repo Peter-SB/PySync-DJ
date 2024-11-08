@@ -4,12 +4,12 @@ import traceback
 
 import pytube.exceptions
 
-from dj_libraries.itunes_library import ItunesLibrary
+from dj_libraries.rekordbox_xml_library import RekordboxXMLLibrary
 from event_queue import EventQueueLogger, EventQueueHandler
 from track_processor import process_track
 from dj_libraries.serato_crate import SeratoCrate
 from settings import SettingsSingleton
-from dj_libraries.rekordbox_library import RekordboxLibrary
+from dj_libraries.rekordbox_m3u_playlist import RekordboxM3UPlaylist
 from utils import load_hashmap_from_json, \
     extract_spotify_playlist_id
 from spotify_helper import SpotifyHelper
@@ -39,7 +39,7 @@ class PySyncDJDownload:
 
         self.spotify_helper = SpotifyHelper(self.event_logger)
         self.ytd_helper = YouTubeDownloadHelper(self.settings.dj_library_drive, self.settings.tracks_folder)
-        self.itunes_library = ItunesLibrary(self.event_logger)
+        self.itunes_library = RekordboxXMLLibrary(self.event_logger)
 
         self.run()
 
@@ -98,7 +98,7 @@ class PySyncDJDownload:
     def save_to_dj_libraries(self, playlist_name, downloaded_track_list):
         self.event_logger.info("Saving DJ library data...")
         SeratoCrate(playlist_name, downloaded_track_list)
-        RekordboxLibrary(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
+        RekordboxM3UPlaylist(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
         self.itunes_library.add_playlist(playlist_name, downloaded_track_list)
 
     def download_playlist(self, playlist_data: list[dict], playlist_index: int) -> list[str]:

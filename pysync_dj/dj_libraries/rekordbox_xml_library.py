@@ -10,7 +10,7 @@ from mutagen.mp3 import MP3
 from settings import SettingsSingleton
 
 
-class ItunesLibrary:
+class RekordboxXMLLibrary:
     """
     This class will build a iTune Music Library.xml to be used by RekordBox. The xml file mimics an iTunes library
     so that users can import there whole PySync DJ library using the import iTunes library feature in RekordBox.
@@ -62,7 +62,7 @@ class ItunesLibrary:
 
         self.add_root_playlist()
 
-    def save_xml(self, file_name: str = "iTunes Music Library.xml") -> None:
+    def save_xml(self, file_name: str = "PySyncLibrary.xml") -> None:
         # Convert to a pretty XML string
         rough_string = ET.tostring(self.plist, "utf-8")
         reparsed = minidom.parseString(rough_string)
