@@ -3,6 +3,8 @@ import json
 import logging
 import os
 import re
+import shutil
+import time
 from logging.handlers import RotatingFileHandler
 from typing import Optional
 
@@ -153,18 +155,24 @@ def save_hashmap_to_json(id_to_video_map: dict, file_drive, file_path: str = "id
 def load_hashmap_from_json(file_drive, file_path: str = "id_to_video_map.json") -> dict:
     """
     Load a hashmap from a JSON file, creating the file with an empty dictionary if it doesn't exist.
+    Creates a backup of the file before loading if it exists.
 
     :param file_drive: The drive to load the hash map from.
     :param file_path: The path to the JSON file from which to load the hashmap.
     :return: The loaded hashmap.
     """
     full_path = os.path.join(file_drive, file_path)
+    backup_path = os.path.join(file_drive, f"{file_path}.{time.strftime('%Y%m%d%H%M%S')}")
+
     if not os.path.exists(full_path):
         # Create the file with an empty dictionary if it doesn't exist
         with open(full_path, 'w') as file:
             json.dump({}, file)
         return {}
     else:
+        # Create a backup of the existing file
+        shutil.copy(full_path, backup_path)
+
         # Load the existing file
         with open(full_path, 'r') as file:
             return json.load(file)

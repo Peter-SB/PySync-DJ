@@ -22,7 +22,7 @@ class SettingsSingleton:
 
     def __new__(cls,
                 event_logger: 'EventQueueLogger' = None,
-                file_path: Optional[str] = "../settings.yaml") -> 'SettingsSingleton':
+                file_path: Optional[str] = "settings.yaml") -> 'SettingsSingleton':
         """
         Create a new instance of SettingsSingleton if it doesn't exist, or return the existing instance.
 
@@ -44,11 +44,21 @@ class SettingsSingleton:
         :param file_path: The path to the JSON file containing settings.
         """
         if file_path is not None and SettingsSingleton._settings is None:
+
             # Normalize the file path for OS compatibility
             safe_file_path = os.path.normpath(file_path)
 
+            # Check if the file exists at the given path
             if not os.path.exists(safe_file_path):
-                raise FileNotFoundError(f"No settings file found at the specified location: {safe_file_path}")
+                # If not found, check the current working directory
+                # because its possible user may have settings in same file as program executable
+                current_dir_path = os.path.join(os.getcwd(), os.path.basename(file_path))
+                if not os.path.exists(current_dir_path):
+                    raise FileNotFoundError(
+                        f"No settings file found at either location: {safe_file_path} or {current_dir_path}"
+                    )
+                safe_file_path = current_dir_path  # Use the file from the current directory
+
             with open(safe_file_path, 'r') as file:
                 SettingsSingleton._settings = yaml.safe_load(file)
 

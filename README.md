@@ -29,11 +29,47 @@ PySync DJ is a Python-based application designed to sync a Spotify library with 
 - **Additional Platform Support**: *(Planned)* Future integration with SoundCloud and custom playlists.
 
 ## Installation
-Ensure you have Python 3.9.13 installed. Clone the repository and install dependencies:
+
+### Windows Mac Usage
+
+1. Download the settings.yaml file [Here](https://github.com/Peter-SB/PySync-DJ/blob/main/settings.yaml).
+2. Download the executable for the operating system you need from the [Actions Tab](https://github.com/Peter-SB/PySync-DJ/actions). Select the latest run, scroll down to Artifacts. Then download for your OS. 
+3. Put the two downloads (Settings.yaml and the program executable) in the same folder.
+4. Run the program.
+
+** **Warning Mac Build Experimental, May Not Work** ** 
+
+### Python Usage
+**Download**  
+Ensure you have Python 3.12 installed. Clone the repository and install dependencies:
 ```bash
 git clone github.com:Peter-SB/PySync-DJ.git
 cd pysync_dj
 pip install -r requirements.txt
+```
+**To Start**  
+Run the program from the command line:
+
+```bash
+python pysync_dj_main.py
+```
+
+If the program pauses without doing anything for more than a few mins, you can always stop it and try again.
+
+**Logs**  
+Can be found in the `logs\` directory .
+
+
+## Has The Wrong Video Been Downloaded? - Specify Custom Video URLs
+Find a better video URL on youtube and put the video url inplace of the current file name in `id_to_video_map.json`. E.g:
+```
+    "5cRDn5aGMLvWsldoRmOOz0": "E:\\pysync_dj_tracks\\Sub Focus - Solar System.mp4",
+```
+
+to
+
+```
+    "5cRDn5aGMLvWsldoRmOOz0": "https://www.youtube.com/watch?v=TUebWv_QXCM",
 ```
 
 ## Configuration
@@ -59,29 +95,7 @@ playlists_to_download:
 ```
 leave `liked_songs_track_limit` and `rekordbox_playlist_folder` as `null` to not use limit.
 
-## Usage
-Run the program from the command line:
 
-```bash
-python pysync_dj_main.py
-```
-
-If the program pauses without doing anything for more than a few mins, you can always stop it and try again.
-
-Logs in the `logs\` directory 
-
-
-### Custom Video URLs
-Put the video url inplace of the current file name in `id_to_video_map.json`
-```
-    "5cRDn5aGMLvWsldoRmOOz0": "E:\\pysync_dj_tracks\\Sub Focus - Solar System.mp4",
-```
-
-to
-
-```
-    "5cRDn5aGMLvWsldoRmOOz0": "https://www.youtube.com/watch?v=TUebWv_QXCM",
-```
 
 ## Contributing
 Contributions to PySync DJ are welcome. 
