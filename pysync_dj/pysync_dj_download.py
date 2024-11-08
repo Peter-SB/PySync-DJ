@@ -98,7 +98,7 @@ class PySyncDJDownload:
     def save_to_dj_libraries(self, playlist_name, downloaded_track_list):
         self.event_logger.info("Saving DJ library data...")
         SeratoCrate(playlist_name, downloaded_track_list)
-        RekordboxM3UPlaylist(playlist_name, downloaded_track_list, self.settings.dj_library_drive)
+        RekordboxM3UPlaylist(playlist_name, downloaded_track_list, self.settings.dj_library_drive).create_m3u_file()
         self.itunes_library.add_playlist(playlist_name, downloaded_track_list)
 
     def download_playlist(self, playlist_data: list[dict], playlist_index: int) -> list[str]:

@@ -15,13 +15,16 @@ class RekordboxM3UPlaylist:
         self.file_drive = file_drive
         self.playlist_name = playlist_name
 
-    def create_m3u_file(self, output_file_name: str) -> None:
+    def create_m3u_file(self) -> None:
         """
         Create an M3U file with the currently added tracks. The file is saved in the directory specified in the
         SettingsSingleton.
 
         :param output_file_name: The name of the output M3U file.
         """
+
+        output_file_name = f"{self.playlist_name}.m3u"
+
         output_file = os.path.join(SettingsSingleton().dj_library_drive,
                                    SettingsSingleton().rekordbox_playlist_folder,
                                    output_file_name)

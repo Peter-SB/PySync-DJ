@@ -22,7 +22,7 @@ class SettingsSingleton:
 
     def __new__(cls,
                 event_logger: 'EventQueueLogger' = None,
-                file_path: Optional[str] = "settings.yaml") -> 'SettingsSingleton':
+                file_path: Optional[str] = "..\settings.yaml") -> 'SettingsSingleton':
         """
         Create a new instance of SettingsSingleton if it doesn't exist, or return the existing instance.
 
@@ -46,7 +46,7 @@ class SettingsSingleton:
         if file_path is not None and SettingsSingleton._settings is None:
 
             # Normalize the file path for OS compatibility
-            safe_file_path = os.path.normpath(file_path)
+            safe_file_path = os.path.join(os.getcwd(), file_path)
 
             # Check if the file exists at the given path
             if not os.path.exists(safe_file_path):
