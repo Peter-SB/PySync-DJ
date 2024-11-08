@@ -14,9 +14,6 @@ jobs:
       - name: Create Executable
         uses: sayyid5416/pyinstaller@v1
         with:
-      - name: Create Mac Executable
-        uses: sayyid5416/pyinstaller@v1
-        with:
           python_ver: '3.9'
           spec: 'PySyncDj.spec'
           requirements: 'requirements.txt'
