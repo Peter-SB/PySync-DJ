@@ -1,15 +1,15 @@
-name: Compile Program for Windows
+name: Compile Program for Mac
 on:
   push:
     branches:
       - 'main'
 jobs:
   pyinstaller-build:
-    runs-on: windows-latest
+    runs-on: macos-latest
     steps:
       - name: Install Requirements.txt
         run: 'pip install nicegui pywebview'
-      - name: Create Windows Executable
+      - name: Create Mac Executable
         uses: sayyid5416/pyinstaller@v1
         with:
           python_ver: '3.9'
