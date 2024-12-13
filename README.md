@@ -8,7 +8,7 @@
 ## Overview
 PySync DJ is a Python-based application designed to sync a Spotify library with a DJ library. It allows users to select Spotify playlists, downloads the tracks as MP3 files (sourced from YouTube), and integrates them with both Serato and Rekordbox DJ libraries. The project aims to streamline the often tedious process of syncing and managing music playlists so we can spend more time DJing!.
 
-**Full 1.0 Design Document [Here](docs/Design%20Specification%20Document.md)**  
+**Design Document [Here](docs/Design%20Specification%20Document.md)**  
 **Release Notes [Here](docs/Relase%20Notes.md)**
 
 <p align="center">
