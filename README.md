@@ -1,3 +1,14 @@
+---
+
+<h1 align="center">⚠️ Disclaimer ⚠️</h1>
+<p align="center">
+<br>
+<b>Buy your music, support artists. The music scene is dying and clubs are closing</b>  <br>
+This project is purely for research purposes. Since YouTube audio quality is capped at 128kbps, this is simply a demo tool. Buy your music for proper quality. <br> 
+For more info about the music scene dying, see resources such as <a href="https://www.saveourscene.uk/about/our-mission">www.saveourscene.uk</a>
+</p>
+
+---
 
 <p align="center">
   <img src='docs/DALLE_logo.png' width='400'>
@@ -105,7 +116,7 @@ Special thanks to the developers of the used libraries, especially Pytube but al
 
 Thanks also to kerrickstaley for their parse_serato_crates.py code.
 
-## ** Disclaimer ** 
+## Terms Of Use 
 This software, is developed solely for personal, non-commercial use. It is intended for research and skill development purposes only. Users must adhere to the following:
 
 1. Compliance: Use PySync DJ in accordance with Spotify's and YouTube's Terms of Service. 
