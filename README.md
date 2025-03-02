@@ -2,7 +2,7 @@
 
 <h1 align="center">⚠️ Disclaimer ⚠️</h1>
 <p align="center">
-<b>Buy your music, support artists. The music scene is dying and clubs are closing</b>  <br>
+<b>Buy your music, support artists. The music scene is dying, and clubs are closing.</b>  <br>
 This project is purely for research purposes. Since YouTube audio quality is capped at 128kbps, this is simply a demo tool. Buy your music for proper quality. <br> 
 For more info about the music scene dying, see resources such as <a href="https://www.saveourscene.uk/about/our-mission">www.saveourscene.uk</a>
 </p>
