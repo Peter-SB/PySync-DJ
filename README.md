@@ -1,6 +1,8 @@
----
+# ⚠️NOTE: This project has been superseded by PySync Hub. A new, refreshed version with a full web ui, more features, and better performance! Check it out [here](https://github.com/Peter-SB/PySync-DJ)
+</br>
+</br>
 
-<h1 align="center">⚠️ Disclaimer ⚠️</h1>
+---
 <p align="center">
 <b>Buy your music, support artists. The music scene is dying, and clubs are closing.</b>  <br>
 This project is purely for research purposes. Since YouTube audio quality is capped at 128kbps, this is simply a demo tool. Buy your music for proper quality. <br> 
